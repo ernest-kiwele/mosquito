@@ -15,9 +15,15 @@
 
 package com.eussence.mosquito.api.http;
 
+import java.net.URI;
 import java.util.Map;
+import java.util.function.BiConsumer;
+import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.StringUtils;
 
 import com.eussence.mosquito.api.AuthType;
+import com.eussence.mosquito.api.exception.CheckedExecutable;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -55,4 +61,39 @@ public final class Request {
 
 	@Builder.Default
 	private ConnectionConfig connectionConfig = new ConnectionConfig(true, 60000L, 180000L, false);
+
+	// readers
+
+	public URI uri() {
+		if (StringUtils.isBlank(this.uri)) {
+			return CheckedExecutable.wrap(() -> new URI("http://localhost:80/?" + this.queryString()));
+		}
+
+		return CheckedExecutable.wrap(() -> new URI(this.uri + "?" + this.queryString()));
+	}
+
+	public String queryString() {
+		if (null != this.parameters && !this.parameters.isEmpty()) {
+			return this.parameters.entrySet()
+					.stream()
+					.map(e -> e.getKey() + "=" + e.getValue())
+					.collect(Collectors.joining("&"));
+		}
+
+		return "";
+	}
+
+	public void applyParameters(BiConsumer<String, String> paramTaker) {
+		if (null == this.parameters && this.parameters.isEmpty())
+			return;
+
+		this.parameters.forEach(paramTaker);
+	}
+
+	public void applyHeaders(BiConsumer<String, String> headerTaker) {
+		if (this.headers == null || this.headers.isEmpty())
+			return;
+
+		this.headers.forEach(headerTaker);
+	}
 }

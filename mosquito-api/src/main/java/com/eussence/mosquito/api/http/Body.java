@@ -17,6 +17,7 @@ package com.eussence.mosquito.api.http;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.Optional;
 
 import javax.ws.rs.core.MediaType;
 
@@ -46,6 +47,19 @@ public class Body {
 		this.entity = entity;
 		this.mediaType = mediaType;
 		this.charSet = charSet;
+	}
+
+	public String textEntity() {
+		if (entity instanceof String)
+			return (String) entity;
+
+		return Optional.ofNullable(entity)
+				.map(Object::toString)
+				.orElseGet(() -> "");
+	}
+
+	public boolean isString() {
+		return entity instanceof String;
 	}
 
 	/**
@@ -78,8 +92,7 @@ public class Body {
 	/**
 	 * Set the value of entity
 	 * 
-	 * @param entity
-	 *            the entity to set
+	 * @param entity the entity to set
 	 */
 	public void setEntity(Object entity) {
 		this.entity = entity;
@@ -88,8 +101,7 @@ public class Body {
 	/**
 	 * Set the value of mediaType
 	 * 
-	 * @param mediaType
-	 *            the mediaType to set
+	 * @param mediaType the mediaType to set
 	 */
 	public void setMediaType(String mediaType) {
 		this.mediaType = mediaType;
@@ -98,8 +110,7 @@ public class Body {
 	/**
 	 * Set the value of charSet
 	 * 
-	 * @param charSet
-	 *            the charSet to set
+	 * @param charSet the charSet to set
 	 */
 	public void setCharSet(String charSet) {
 		this.charSet = charSet;
@@ -141,8 +152,8 @@ public class Body {
 			}
 		}
 
-		throw new IllegalStateException(
-				"Failed to convert class " + this.entity.getClass().getName() + " to byte array");
+		throw new IllegalStateException("Failed to convert class " + this.entity.getClass()
+				.getName() + " to byte array");
 	}
 
 	public String string() {
@@ -169,6 +180,7 @@ public class Body {
 			}
 		}
 
-		throw new IllegalStateException("Failed to convert class " + this.entity.getClass().getName() + " to String");
+		throw new IllegalStateException("Failed to convert class " + this.entity.getClass()
+				.getName() + " to String");
 	}
 }

@@ -26,6 +26,7 @@ module com.eussence.mosquito.api {
 	exports com.eussence.mosquito.api.command;
 	exports com.eussence.mosquito.api.execution;
 	exports com.eussence.mosquito.api.qa;
+	exports com.eussence.mosquito.api.exception;
 
 	requires transitive com.fasterxml.jackson.annotation;
 	requires transitive com.fasterxml.jackson.core;
