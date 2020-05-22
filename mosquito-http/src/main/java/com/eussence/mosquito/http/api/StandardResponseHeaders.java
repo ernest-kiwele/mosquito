@@ -13,29 +13,33 @@
  * limitations under the License.
  */
 
-package com.eussence.mosquito.http.driver;
-
-import java.util.concurrent.CompletableFuture;
-
-import com.eussence.mosquito.api.http.Request;
-import com.eussence.mosquito.api.http.Response;
-import com.eussence.mosquito.http.api.HttpDriver;
+package com.eussence.mosquito.http.api;
 
 /**
- * Default HTTP driver implemented using JDK-provided HTTP client APIs.
+ * A collection of the most commonly used HTTP headers.
  * 
  * @author Ernest Kiwele
+ *
  */
-public class StandardHttpDriver implements HttpDriver {
+public enum StandardResponseHeaders {
 
-	@Override
-	public Response http(Request request) {
-		return null;
+	CONTENT_TYPE("Content-Type"),
+
+	CONTENT_LENGTH("Content-Length"),
+
+	DATE("Date"),
+
+	SERVER("Server"),
+
+	COOKIE("Set-Cookie");
+
+	private final String headerName;
+
+	StandardResponseHeaders(String n) {
+		this.headerName = n;
 	}
 
-	@Override
-	public CompletableFuture<Response> asyncHttp(Request request) {
-		// TODO Auto-generated method stub
-		return null;
+	public String getHeaderName() {
+		return headerName;
 	}
 }

@@ -15,6 +15,8 @@
 
 package com.eussence.mosquito.http.api;
 
+import java.util.concurrent.CompletableFuture;
+
 import com.eussence.mosquito.api.http.Request;
 import com.eussence.mosquito.api.http.Response;
 
@@ -35,4 +37,16 @@ public interface HttpDriver {
 	 * @return The result of the call as a Response object.
 	 */
 	Response http(Request request);
+
+	/**
+	 * Run the given HTTP request, convert the outcome into a Response object. This
+	 * method will not throw exceptions due to network or protocol-related failures;
+	 * only allowed exceptions concern validation.
+	 * 
+	 * This is an asynchronous counterpart of {@link #http(Request) http(Request)}.
+	 * 
+	 * @param request All request information
+	 * @return The result of the call as a Response object as a completable future.
+	 */
+	CompletableFuture<Response> asyncHttp(Request request);
 }

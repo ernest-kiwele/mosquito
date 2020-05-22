@@ -26,28 +26,31 @@ import org.apache.commons.lang3.StringUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 /**
  * A request body.
  * 
  * @author Ernest Kiwele
  */
+@Builder
+@Getter
+@Setter
+
+@AllArgsConstructor
+@NoArgsConstructor
 public class Body {
 
 	private Object entity;
+	@Builder.Default
 	private String mediaType = MediaType.APPLICATION_JSON;
 	private String charSet;
 
 	private static final ObjectMapper objectMapper = new ObjectMapper();
-
-	public Body() {
-
-	}
-
-	public Body(Object entity, String mediaType, String charSet) {
-		this.entity = entity;
-		this.mediaType = mediaType;
-		this.charSet = charSet;
-	}
 
 	public String textEntity() {
 		if (entity instanceof String)
@@ -60,60 +63,6 @@ public class Body {
 
 	public boolean isString() {
 		return entity instanceof String;
-	}
-
-	/**
-	 * Get the value of entity
-	 * 
-	 * @return the entity
-	 */
-	public Object getEntity() {
-		return entity;
-	}
-
-	/**
-	 * Get the value of mediaType
-	 * 
-	 * @return the mediaType
-	 */
-	public String getMediaType() {
-		return mediaType;
-	}
-
-	/**
-	 * Get the value of charSet
-	 * 
-	 * @return the charSet
-	 */
-	public String getCharSet() {
-		return charSet;
-	}
-
-	/**
-	 * Set the value of entity
-	 * 
-	 * @param entity the entity to set
-	 */
-	public void setEntity(Object entity) {
-		this.entity = entity;
-	}
-
-	/**
-	 * Set the value of mediaType
-	 * 
-	 * @param mediaType the mediaType to set
-	 */
-	public void setMediaType(String mediaType) {
-		this.mediaType = mediaType;
-	}
-
-	/**
-	 * Set the value of charSet
-	 * 
-	 * @param charSet the charSet to set
-	 */
-	public void setCharSet(String charSet) {
-		this.charSet = charSet;
 	}
 
 	public Object jsonEntity() {
