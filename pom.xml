@@ -20,11 +20,11 @@
 	</modules>
 
 	<properties>
-		<jackson.version>2.11.0</jackson.version>
-		<commons.lang.version>3.10</commons.lang.version>
-		<vert.x.version>3.9.0</vert.x.version>
-		<groovy.version>3.0.1</groovy.version>
-		<slf4j.version>1.7.26</slf4j.version>
+		<jackson.version>2.11.3</jackson.version>
+		<commons.lang.version>3.11</commons.lang.version>
+		<vert.x.version>3.9.3</vert.x.version>
+		<groovy.version>3.0.5</groovy.version>
+		<slf4j.version>1.7.30</slf4j.version>
 
 		<lombok.version>1.18.10</lombok.version>
 	</properties>
