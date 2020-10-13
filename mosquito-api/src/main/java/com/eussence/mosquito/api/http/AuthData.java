@@ -23,15 +23,13 @@ package com.eussence.mosquito.api.http;
 public class AuthData {
 
 	private final String username;
-	private final char[] password;
+	private final char[] credentials;
 	private final String headerName;
-	private final String token;
 
-	public AuthData(String username, char[] password, String headerName, String token) {
+	public AuthData(String username, char[] password, String headerName) {
 		this.username = username;
-		this.password = password;
+		this.credentials = password;
 		this.headerName = headerName;
-		this.token = token;
 	}
 
 	/**
@@ -49,7 +47,7 @@ public class AuthData {
 	 * @return the password
 	 */
 	public char[] getPassword() {
-		return password;
+		return credentials;
 	}
 
 	/**
@@ -61,12 +59,7 @@ public class AuthData {
 		return headerName;
 	}
 
-	/**
-	 * Get the value of token
-	 * 
-	 * @return the token
-	 */
-	public String getToken() {
-		return token;
+	public char[] getCredentials() {
+		return credentials;
 	}
 }
