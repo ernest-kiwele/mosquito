@@ -46,7 +46,7 @@ public interface HttpDriver {
 	 * This is an asynchronous counterpart of {@link #http(Request) http(Request)}.
 	 * 
 	 * @param request All request information
-	 * @return The result of the call as a Response object as a completable future.
+	 * @return The result of the call as a Response object as a completable future*.
 	 */
 	CompletableFuture<Response> asyncHttp(Request request);
 }

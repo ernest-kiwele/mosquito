@@ -61,7 +61,8 @@ import groovy.lang.Script;
  */
 public class MosquitoScriptContext extends Script {
 
-	private static ClientBinding<?, ?, ?> client = DefaultClient.builder().build();
+	private static ClientBinding<?, ?, ?> client = DefaultClient.builder()
+			.build();
 
 	private static final ObjectMapper objectMapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
 
@@ -92,7 +93,8 @@ public class MosquitoScriptContext extends Script {
 
 	public Call call(String key, String uri) {
 		Call c = new Call().key(key);
-		c.getRequestTemplate().set("uri", uri);
+		c.getRequestTemplate()
+				.set("uri", uri);
 
 		return c;
 	}
@@ -110,21 +112,33 @@ public class MosquitoScriptContext extends Script {
 	}
 
 	public Response get(Object uri) {
-		return this.http(MapObject.instance().add("uri", uri).add("method", HttpMethod.GET)._map());
+		return this.http(MapObject.instance()
+				.add("uri", uri)
+				.add("method", HttpMethod.GET)
+				._map());
 	}
 
-	public Map<String, String> head(Object uri) {
-		return this.http(MapObject.instance().add("uri", uri).add("method", HttpMethod.HEAD)._map()).getHeaders();
+	public Map<String, List<String>> head(Object uri) {
+		return this.http(MapObject.instance()
+				.add("uri", uri)
+				.add("method", HttpMethod.HEAD)
+				._map())
+				.getHeaders();
 	}
 
 	public Response post(String uri, Object entity) {
 		return this.post(uri, entity, Map.of());
 	}
 
-	public Response post(String uri, Object entity, Map<String, Object> params) {
-		return this.http(MapObject.instance().add("uri", uri).add("method", HttpMethod.POST)
-				.add("body",
-						MapObject.instance().add("entity", entity).add("mediaType", MediaType.APPLICATION_JSON)._map())
+	public Response post(String uri, Object entity, Map<String, Object> headers) {
+		return this.http(MapObject.instance()
+				.add("uri", uri)
+				.add("method", HttpMethod.POST)
+				.add("headers", headers)
+				.add("body", MapObject.instance()
+						.add("entity", entity)
+						.add("mediaType", MediaType.APPLICATION_JSON)
+						._map())
 				._map());
 	}
 
@@ -155,7 +169,12 @@ public class MosquitoScriptContext extends Script {
 	}
 
 	public Environment environment(String key, String name, boolean production, Map<String, Object> vars) {
-		return Environment.builder().key(key).name(name).production(production).vars(MapObject.instance()._map(vars))
+		return Environment.builder()
+				.key(key)
+				.name(name)
+				.production(production)
+				.vars(MapObject.instance()
+						._map(vars))
 				.build();
 	}
 
@@ -172,7 +191,10 @@ public class MosquitoScriptContext extends Script {
 	}
 
 	public Map<String, Object> systemVars() {
-		return System.getenv().entrySet().stream().collect(Collectors.toMap(Entry::getKey, Entry::getValue));
+		return System.getenv()
+				.entrySet()
+				.stream()
+				.collect(Collectors.toMap(Entry::getKey, Entry::getValue));
 	}
 
 	public String systemVar(String var) {
@@ -193,8 +215,8 @@ public class MosquitoScriptContext extends Script {
 
 	public void report(ExecutionResult result, String htmlPath) {
 		try {
-			IOUtils.write(BasicReportTemplate.getInstance().getDefaultResultReport(result),
-					new FileOutputStream(htmlPath));
+			IOUtils.write(BasicReportTemplate.getInstance()
+					.getDefaultResultReport(result), new FileOutputStream(htmlPath));
 			System.out.println("[Report exported to $htmlPath]");
 		} catch (Exception ex) {
 			System.err.println("Failed to generate or save report: " + ex.getMessage());

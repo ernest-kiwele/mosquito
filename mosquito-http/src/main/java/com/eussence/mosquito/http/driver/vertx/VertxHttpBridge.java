@@ -18,6 +18,7 @@ package com.eussence.mosquito.http.driver.vertx;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
@@ -65,7 +66,8 @@ public class VertxHttpBridge {
 		}
 
 		RequestOptions options = new RequestOptions().setHost(u.getHost())
-				.setSsl("https".equalsIgnoreCase(u.getScheme())).setURI(u.getPath() + "/?" + u.getQuery());
+				.setSsl("https".equalsIgnoreCase(u.getScheme()))
+				.setURI(u.getPath() + "/?" + u.getQuery());
 
 		if (0 > u.getPort()) {
 			if ("http".equalsIgnoreCase(u.getScheme())) {
@@ -87,40 +89,56 @@ public class VertxHttpBridge {
 
 		switch (request.getMethod()) {
 			case GET: {
-				req = client.get(this.uriRequestOptions(request.getUri())).handler(responsehandler)
+				req = client.get(this.uriRequestOptions(request.getUri()))
+						.handler(responsehandler)
 						.exceptionHandler(exceptionHandler);
 				break;
 			}
 			case POST: {
-				req = client.post(this.uriRequestOptions(request.getUri())).setChunked(true).handler(responsehandler)
-						.putHeader("Content-Type", request.getBody().getMediaType()).exceptionHandler(exceptionHandler)
-						.write(Buffer.buffer(request.getBody().bytes()));
+				req = client.post(this.uriRequestOptions(request.getUri()))
+						.setChunked(true)
+						.handler(responsehandler)
+						.putHeader("Content-Type", request.getBody()
+								.getMediaType())
+						.exceptionHandler(exceptionHandler)
+						.write(Buffer.buffer(request.getBody()
+								.bytes()));
 				break;
 			}
 			case PUT: {
-				req = client.put(this.uriRequestOptions(request.getUri())).setChunked(true).handler(responsehandler)
-						.putHeader("Content-Type", request.getBody().getMediaType()).exceptionHandler(exceptionHandler)
-						.write(Buffer.buffer(request.getBody().bytes()));
+				req = client.put(this.uriRequestOptions(request.getUri()))
+						.setChunked(true)
+						.handler(responsehandler)
+						.putHeader("Content-Type", request.getBody()
+								.getMediaType())
+						.exceptionHandler(exceptionHandler)
+						.write(Buffer.buffer(request.getBody()
+								.bytes()));
 				break;
 			}
 			case DELETE: {
-				req = client.delete(this.uriRequestOptions(request.getUri())).handler(responsehandler)
+				req = client.delete(this.uriRequestOptions(request.getUri()))
+						.handler(responsehandler)
 						.exceptionHandler(exceptionHandler);
 				break;
 			}
 			case HEAD: {
-				req = client.head(this.uriRequestOptions(request.getUri())).handler(responsehandler)
+				req = client.head(this.uriRequestOptions(request.getUri()))
+						.handler(responsehandler)
 						.exceptionHandler(exceptionHandler);
 				break;
 			}
 			case OPTIONS: {
-				req = client.options(this.uriRequestOptions(request.getUri())).handler(responsehandler)
+				req = client.options(this.uriRequestOptions(request.getUri()))
+						.handler(responsehandler)
 						.exceptionHandler(exceptionHandler);
 				break;
 			}
 			case PATCH: {
-				req = client.post(this.uriRequestOptions(request.getUri())).setRawMethod("PATCH")
-						.handler(responsehandler).exceptionHandler(exceptionHandler);
+				req = client.post(this.uriRequestOptions(request.getUri()))
+						.setRawMethod("PATCH")
+						.handler(responsehandler)
+						.exceptionHandler(exceptionHandler);
 				break;
 			}
 			default: {
@@ -128,22 +146,33 @@ public class VertxHttpBridge {
 			}
 		}
 
-		request.getHeaders().forEach(req::putHeader);
+		request.getHeaders()
+				.forEach(req::putHeader);
 
 		req.putHeader("User-Agent", "ernest.kiwele");
-		return req.setTimeout(request.getConnectionConfig().getConnectionTimeout())
-				.setFollowRedirects(request.getConnectionConfig().isFollowRedirects());
+		return req.setTimeout(request.getConnectionConfig()
+				.getConnectionTimeout())
+				.setFollowRedirects(request.getConnectionConfig()
+						.isFollowRedirects());
 	}
 
 	public void fillResponseFuture(HttpClientResponse response, CompletableFuture<Response> future) {
 
-		Map<String, String> headers = response.headers().entries().stream()
-				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1));
-		Map<String, String> cookies = response.cookies().stream().map(s -> s.split("="))
+		Map<String, List<String>> headers = response.headers()
+				.entries()
+				.stream()
+				.collect(Collectors.groupingBy(Map.Entry::getKey,
+						Collectors.mapping(Map.Entry::getValue, Collectors.toList())));
+		Map<String, String> cookies = response.cookies()
+				.stream()
+				.map(s -> s.split("="))
 				.collect(Collectors.toMap(arr -> arr[0], arr -> arr[1], (c1, c2) -> c1));
 
-		Response.Builder builder = new Response.Builder().status(response.statusCode()).headers(headers)
-				.statusReason(response.statusMessage()).cookies(cookies);
+		Response.ResponseBuilder builder = Response.builder()
+				.status(response.statusCode())
+				.headers(headers)
+				.statusReason(response.statusMessage())
+				.cookies(cookies);
 
 		response.bodyHandler(body -> {
 
@@ -172,7 +201,8 @@ public class VertxHttpBridge {
 
 		String[] parts = contentTypeHeader.split(";");
 		for (String part : parts) {
-			if (part.trim().startsWith("charset=")) {
+			if (part.trim()
+					.startsWith("charset=")) {
 				return part.split("=")[1];
 			}
 		}
@@ -195,7 +225,10 @@ public class VertxHttpBridge {
 
 	public Response sendNow(HttpClient client, Request request) {
 
-		return send(client, request).exceptionally(Response.Builder::exception).join();
+		return send(client, request).exceptionally(exception -> Response.builder()
+				.exception(exception)
+				.build())
+				.join();
 	}
 
 	public CompletableFuture<Response> send(HttpClient client, Request request) {

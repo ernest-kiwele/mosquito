@@ -33,15 +33,23 @@ import com.eussence.mosquito.http.api.StandardResponseHeaders;
 public class StandardResponseFactory {
 
 	public Response create(HttpResponse<?> response) {
-		
-		return Response.builder().status(response.statusCode())
-				.headers(response.headers().map())
-				.length(Integer.parseInt(response.headers().firstValue(StandardResponseHeaders.CONTENT_LENGTH.getHeaderName()).orElse("-1")))
+
+		return Response.builder()
+				.status(response.statusCode())
+				.headers(response.headers()
+						.map())
+				.length(Integer.parseInt(response.headers()
+						.firstValue(StandardResponseHeaders.CONTENT_LENGTH.getHeaderName())
+						.orElse("-1")))
 				.cookies(this.readCookies(response))
 				.failed(false)
-				.uri(response.uri().toASCIIString())
-				.body(body)
-		
+				.uri(response.uri()
+						.toASCIIString())
+//				.body(body)
+
+				// TODO
+				.build();
+
 //		this.status = status;
 //		this.statusReason = statusReason;
 //		this.length = contentLength;
@@ -56,7 +64,6 @@ public class StandardResponseFactory {
 	}
 
 	private Body readBody(HttpResponse<?> resp) {
-		Object entity = resp.body();
 
 		String contentType = resp.headers()
 				.firstValue(StandardResponseHeaders.CONTENT_TYPE.getHeaderName())
@@ -65,6 +72,34 @@ public class StandardResponseFactory {
 			return Body.builder()
 					.build();
 		}
+
+		Body.BodyBuilder builder = Body.builder();
+		if (contentType.indexOf(";") >= 0) {
+			builder.mediaType(contentType.substring(0, contentType.indexOf(";")));
+		} else {
+			builder.mediaType(contentType);
+		}
+
+		builder.charSet(this.extractCharSet(contentType));
+		Object entity = resp.body();
+
+		return builder.build();
+	}
+
+	private String extractCharSet(String contentTypeHeader) {
+		if (StringUtils.isBlank(contentTypeHeader)) {
+			return null;
+		}
+
+		String[] parts = contentTypeHeader.split(";");
+		for (String part : parts) {
+			if (part.trim()
+					.startsWith("charset=")) {
+				return part.split("=")[1];
+			}
+		}
+
+		return null;
 	}
 
 	private Map<String, String> readCookies(HttpResponse<?> resp) {
