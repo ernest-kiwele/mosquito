@@ -222,7 +222,7 @@ public class MosquitoCli {
 	}
 
 	private String highlightJson(String json) {
-		if (null == json || json.length() > 2000) {
+		if (null == json || json.length() > 5000) {
 			return json;
 		}
 
