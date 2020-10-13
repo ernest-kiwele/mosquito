@@ -15,6 +15,7 @@
 
 package com.eussence.mosquito.api.http;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -47,7 +48,8 @@ public class Response {
 
 	private String uri;
 
-	private Map<String, List<String>> headers;
+	@Builder.Default
+	private Map<String, List<String>> headers = new HashMap<>();
 
 	private Map<String, String> cookies;
 
