@@ -39,8 +39,7 @@ public interface ClientBinding<CL, RQ, RS> {
 	/**
 	 * Submit a request to be executed synchronously.
 	 * 
-	 * @param request
-	 *            The request to be submitted.
+	 * @param request The request to be submitted.
 	 * @return The response representing the outcome of the call.
 	 */
 	Response send(Request request);
@@ -48,8 +47,7 @@ public interface ClientBinding<CL, RQ, RS> {
 	/**
 	 * Make an asynchronous execution of the request.
 	 * 
-	 * @param request
-	 *            The request to be submitted.
+	 * @param request The request to be submitted.
 	 * @return A future of the result.
 	 */
 	CompletableFuture<Response> sendAsync(Request request);

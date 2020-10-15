@@ -40,13 +40,12 @@ import com.eussence.mosquito.api.data.Environment;
 import com.eussence.mosquito.api.data.Vars;
 import com.eussence.mosquito.api.execution.ExecutionResult;
 import com.eussence.mosquito.api.execution.ExecutionSchedule;
-import com.eussence.mosquito.api.http.ClientBinding;
 import com.eussence.mosquito.api.http.HttpMethod;
 import com.eussence.mosquito.api.http.Request;
 import com.eussence.mosquito.api.http.Response;
 import com.eussence.mosquito.api.qa.Assertion;
 import com.eussence.mosquito.api.utils.Templates;
-import com.eussence.mosquito.http.api.DefaultClient;
+import com.eussence.mosquito.http.driver.HttpDriverFactoryLocator;
 import com.eussence.mosquito.reports.template.BasicReportTemplate;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -60,9 +59,6 @@ import groovy.lang.Script;
  * @author Ernest Kiwele
  */
 public class MosquitoScriptContext extends Script {
-
-	private static ClientBinding<?, ?, ?> client = DefaultClient.builder()
-			.build();
 
 	private static final ObjectMapper objectMapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
 
@@ -108,7 +104,9 @@ public class MosquitoScriptContext extends Script {
 	}
 
 	public Response http(Map<String, Object> input) {
-		return client.send(request(input));
+		return HttpDriverFactoryLocator.getInstance()
+				.getSelectedDriver()
+				.http(request(input));
 	}
 
 	public Response get(Object uri) {

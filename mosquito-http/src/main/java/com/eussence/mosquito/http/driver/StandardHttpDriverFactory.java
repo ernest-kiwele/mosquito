@@ -15,36 +15,41 @@
 
 package com.eussence.mosquito.http.driver;
 
-import java.util.concurrent.CompletableFuture;
-
-import com.eussence.mosquito.api.http.Request;
-import com.eussence.mosquito.api.http.Response;
 import com.eussence.mosquito.http.api.HttpDriver;
+import com.eussence.mosquito.http.api.HttpDriverFactory;
 
 /**
- * Driver for the java.net.http-based implementation of the HTTP client
- * machinery.
+ * Default HTTP driver implemented using JDK-provided HTTP client APIs.
  * 
  * @author Ernest Kiwele
  */
-public class StandardHttpDriver implements HttpDriver {
+public class StandardHttpDriverFactory implements HttpDriverFactory {
 
-	private static final StandardHttpDriver instance = new StandardHttpDriver();
+	public static final String PROVIDER_NAME = "com.eussence";
 
-	private StandardHttpDriver() {
-	}
-
-	public static StandardHttpDriver getInstance() {
-		return instance;
+	@Override
+	public String getProvider() {
+		return PROVIDER_NAME;
 	}
 
 	@Override
-	public Response http(Request request) {
-		return null;
+	public String getName() {
+		return "Standard HTTP Driver";
 	}
 
 	@Override
-	public CompletableFuture<Response> asyncHttp(Request request) {
-		return null;
+	public String getDescription() {
+		return "Driver implemented using java.net.http module";
 	}
+
+	@Override
+	public String getFeaturesDescription() {
+		return "Supports all methods and content types, but does not support multipart requests";
+	}
+
+	@Override
+	public HttpDriver getDriver() {
+		return StandardHttpDriver.getInstance();
+	}
+
 }

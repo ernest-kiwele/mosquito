@@ -1,3 +1,4 @@
+
 /**
  * Copyright 2018 eussence.com and contributors Licensed under the Apache
  * License, Version 2.0 (the "License"); you may not use this file except in
@@ -21,6 +22,7 @@ module com.eussence.mosquito.http {
 	exports com.eussence.mosquito.http.api;
 	exports com.eussence.mosquito.http.api.common;
 	exports com.eussence.mosquito.http.api.mapping;
+	exports com.eussence.mosquito.http.driver;
 
 	requires transitive com.eussence.mosquito.api;
 	requires com.fasterxml.jackson.core;
@@ -30,4 +32,9 @@ module com.eussence.mosquito.http {
 	requires org.codehaus.groovy;
 	requires vertx.core;
 	requires java.net.http;
+
+	uses com.eussence.mosquito.http.api.HttpDriverFactory;
+
+	provides com.eussence.mosquito.http.api.HttpDriverFactory
+			with com.eussence.mosquito.http.driver.StandardHttpDriverFactory;
 }

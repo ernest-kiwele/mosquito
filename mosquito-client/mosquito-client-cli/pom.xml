@@ -11,6 +11,8 @@
 	<name>Mosquito Client - CLI</name>
 	<description>Command-line mosquito client</description>
 
+	<!-- <packaging>jlink</packaging> -->
+
 	<properties>
 		<module.name>${project.groupId}.mosquito.client.cli</module.name>
 		<mosquito.main.class>com.eussence.mosquito.client.cli.MosquitoCli</mosquito.main.class>
@@ -38,43 +40,80 @@
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-shade-plugin</artifactId>
-				<version>1.6</version>
-				<configuration>
-					<createDependencyReducedPom>true</createDependencyReducedPom>
-					<filters>
-						<filter>
-							<artifact>*:*</artifact>
-							<excludes>
-								<exclude>META-INF/*.SF</exclude>
-								<exclude>META-INF/*.DSA</exclude>
-								<exclude>META-INF/*.RSA</exclude>
-							</excludes>
-						</filter>
-					</filters>
-				</configuration>
-
+				<artifactId>maven-dependency-plugin</artifactId>
+				<version>3.1.2</version>
 				<executions>
 					<execution>
 						<phase>package</phase>
 						<goals>
-							<goal>shade</goal>
+							<goal>copy-dependencies</goal>
 						</goals>
 						<configuration>
-							<transformers>
-								<transformer
-									implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
-								<transformer
-									implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-									<manifestEntries>
-										<Main-Class>${mosquito.main.class}</Main-Class>
-									</manifestEntries>
-								</transformer>
-							</transformers>
+							<outputDirectory>${project.build.directory}/lib</outputDirectory>
 						</configuration>
 					</execution>
 				</executions>
 			</plugin>
+
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>3.2.0</version>
+				<configuration>
+					<archive>
+						<manifest>
+							<mainClass>${mosquito.main.class}</mainClass>
+							<addClasspath>false</addClasspath>
+							<classpathPrefix>lib/</classpathPrefix>
+						</manifest>
+
+						<manifestEntries>
+							<Module-Path>lib/*.jar</Module-Path>
+						</manifestEntries>
+					</archive>
+				</configuration>
+			</plugin>
+
+<!-- 			<plugin> -->
+<!-- 				<groupId>org.apache.maven.plugins</groupId> -->
+<!-- 				<artifactId>maven-shade-plugin</artifactId> -->
+<!-- 				<version>1.6</version> -->
+<!-- 				<configuration> -->
+<!-- 					<createDependencyReducedPom>true</createDependencyReducedPom> -->
+<!-- 					<filters> -->
+<!-- 						<filter> -->
+<!-- 							<artifact>*:*</artifact> -->
+<!-- 							<excludes> -->
+<!-- 								<exclude>META-INF/*.SF</exclude> -->
+<!-- 								<exclude>META-INF/*.DSA</exclude> -->
+<!-- 								<exclude>META-INF/*.RSA</exclude> -->
+<!-- 							</excludes> -->
+<!-- 						</filter> -->
+<!-- 					</filters> -->
+<!-- 				</configuration> -->
+
+<!-- 				<executions> -->
+<!-- 					<execution> -->
+<!-- 						<phase>package</phase> -->
+<!-- 						<goals> -->
+<!-- 							<goal>shade</goal> -->
+<!-- 						</goals> -->
+<!-- 						<configuration> -->
+<!-- 							<transformers> -->
+<!-- 								<transformer -->
+<!-- 									implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" /> -->
+<!-- 								<transformer -->
+<!-- 									implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer"> -->
+<!-- 									<manifestEntries> -->
+<!-- 										<Main-Class>${mosquito.main.class}</Main-Class> -->
+<!-- 									</manifestEntries> -->
+<!-- 								</transformer> -->
+<!-- 							</transformers> -->
+<!-- 						</configuration> -->
+<!-- 					</execution> -->
+<!-- 				</executions> -->
+<!-- 			</plugin> -->
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>exec-maven-plugin</artifactId>
@@ -83,6 +122,34 @@
 					<mainClass>${mosquito.main.class}</mainClass>
 				</configuration>
 			</plugin>
+			<plugin>
+				<artifactId>maven-jlink-plugin</artifactId>
+				<version>3.0.0-alpha-1</version>
+				<extensions>true</extensions>
+				<configuration>
+					<!-- configuration elements goes here -->
+				</configuration>
+				<dependencies>
+					<dependency>
+						<groupId>org.ow2.asm</groupId>
+						<artifactId>asm</artifactId>
+						<version>9.0</version>
+					</dependency>
+				</dependencies>
+			</plugin>
 		</plugins>
 	</build>
+
+	<pluginRepositories>
+		<pluginRepository>
+			<id>apache.snapshots</id>
+			<url>http://repository.apache.org/snapshots/</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</pluginRepository>
+	</pluginRepositories>
 </project>

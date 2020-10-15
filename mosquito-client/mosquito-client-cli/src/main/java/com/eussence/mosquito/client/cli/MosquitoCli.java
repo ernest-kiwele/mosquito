@@ -48,6 +48,8 @@ import com.eussence.mosquito.command.internal.GroovyResolver;
 import com.eussence.mosquito.core.api.Ether;
 import com.eussence.mosquito.core.api.Mosquito;
 import com.eussence.mosquito.http.api.DefaultClient;
+import com.eussence.mosquito.http.api.HttpDriverFactory;
+import com.eussence.mosquito.http.driver.HttpDriverFactoryLocator;
 
 /**
  * Entry point to the CLI Mosquito client.
@@ -324,7 +326,8 @@ public class MosquitoCli {
 			if ((trigger != null) && (line.compareTo(trigger) == 0))
 				line = reader.readLine("password> ", mask);
 
-			if (!StringUtils.startsWithAny(line, "quit", "exit", "cls", "error", "trace")) {
+			if (!StringUtils.startsWithAny(line, "quit", "exit", "cls", "error", "trace", "driver-info",
+					"list-drivers")) {
 				String output = this.runCommand(line);
 				if (StringUtils.isNotBlank(output)) {
 					terminal.writer()
@@ -370,13 +373,55 @@ public class MosquitoCli {
 							.println("[Nothing to show]");
 				}
 				terminal.flush();
+			} else if ("driver-info".equalsIgnoreCase(line)) {
+				HttpDriverFactory factory = HttpDriverFactoryLocator.getInstance()
+						.getSelectedFactory();
+
+				terminal.writer()
+						.println(new AttributedStringBuilder().style(AttributedStyle.DEFAULT)
+								.append(StringUtils.rightPad("Driver name:", 15))
+								.style(AttributedStyle.DEFAULT.foreground(AttributedStyle.MAGENTA))
+								.append(factory.getName()));
+				terminal.writer()
+						.println(new AttributedStringBuilder().style(AttributedStyle.DEFAULT)
+								.append(StringUtils.rightPad("Provided by:", 15))
+								.style(AttributedStyle.DEFAULT.foreground(AttributedStyle.MAGENTA))
+								.append(factory.getProvider()));
+				terminal.writer()
+						.println(new AttributedStringBuilder().style(AttributedStyle.DEFAULT)
+								.append(StringUtils.rightPad("Description:", 15))
+								.style(AttributedStyle.DEFAULT.foreground(AttributedStyle.MAGENTA))
+								.append(factory.getDescription()));
+				terminal.writer()
+						.println(new AttributedStringBuilder().style(AttributedStyle.DEFAULT)
+								.append(StringUtils.rightPad("Features:", 15)));
+				terminal.writer()
+						.println(new AttributedStringBuilder()
+								.style(AttributedStyle.DEFAULT.foreground(AttributedStyle.MAGENTA))
+								.append(factory.getDescription()));
+				terminal.flush();
+			} else if ("list-drivers".equalsIgnoreCase(line)) {
+				var services = HttpDriverFactoryLocator.getInstance()
+						.listServices();
+
+				services.forEach(factory -> {
+					terminal.writer()
+							.println(new AttributedStringBuilder().style(AttributedStyle.DEFAULT)
+									.append(StringUtils.rightPad("Driver name:", 15))
+									.style(AttributedStyle.DEFAULT.foreground(AttributedStyle.MAGENTA))
+									.append(factory.getName()));
+					terminal.writer()
+							.println(new AttributedStringBuilder().style(AttributedStyle.DEFAULT)
+									.append(StringUtils.rightPad("Provided by:", 15))
+									.style(AttributedStyle.DEFAULT.foreground(AttributedStyle.MAGENTA))
+									.append(factory.getProvider()));
+				});
+				terminal.flush();
 			} else {
 				terminal.writer()
 						.println("I didn't get that... try again!");
 				terminal.flush();
 			}
-
-			// ParsedLine pl = reader.getParser().parse(line, 0);
 		}
 	}
 }
