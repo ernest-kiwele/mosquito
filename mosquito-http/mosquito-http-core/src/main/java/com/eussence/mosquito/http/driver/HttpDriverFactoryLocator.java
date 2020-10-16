@@ -15,6 +15,7 @@
 
 package com.eussence.mosquito.http.driver;
 
+import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Optional;
@@ -69,7 +70,8 @@ public class HttpDriverFactoryLocator {
 	public Optional<HttpDriverFactory> getAny() {
 		return this.listServices()
 				.stream()
-				.findAny();
+				.sorted(Comparator.comparing(HttpDriverFactory::getName))
+				.findFirst();
 	}
 
 	public Optional<HttpDriverFactory> findAnyByProvider(String providerName) {

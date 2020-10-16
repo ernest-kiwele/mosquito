@@ -398,7 +398,7 @@ public class MosquitoCli {
 				terminal.writer()
 						.println(new AttributedStringBuilder()
 								.style(AttributedStyle.DEFAULT.foreground(AttributedStyle.MAGENTA))
-								.append(factory.getDescription()));
+								.append(factory.getFeaturesDescription()));
 				terminal.flush();
 			} else if ("list-drivers".equalsIgnoreCase(line)) {
 				var services = HttpDriverFactoryLocator.getInstance()
@@ -406,15 +406,13 @@ public class MosquitoCli {
 
 				services.forEach(factory -> {
 					terminal.writer()
-							.println(new AttributedStringBuilder().style(AttributedStyle.DEFAULT)
-									.append(StringUtils.rightPad("Driver name:", 15))
+							.println(new AttributedStringBuilder()
 									.style(AttributedStyle.DEFAULT.foreground(AttributedStyle.MAGENTA))
-									.append(factory.getName()));
-					terminal.writer()
-							.println(new AttributedStringBuilder().style(AttributedStyle.DEFAULT)
-									.append(StringUtils.rightPad("Provided by:", 15))
+									.append("\"" + factory.getName() + "\"")
+									.style(AttributedStyle.DEFAULT)
+									.append(StringUtils.rightPad(", provided by ", 15))
 									.style(AttributedStyle.DEFAULT.foreground(AttributedStyle.MAGENTA))
-									.append(factory.getProvider()));
+									.append("\"" + factory.getProvider() + "\""));
 				});
 				terminal.flush();
 			} else {

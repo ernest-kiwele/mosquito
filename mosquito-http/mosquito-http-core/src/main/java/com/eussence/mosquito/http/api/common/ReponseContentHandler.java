@@ -46,7 +46,7 @@ public interface ReponseContentHandler {
 			.build();
 
 	static final Map<String, ReponseContentHandler> standardHandlers = Map.of(MediaType.APPLICATION_JSON, jsonHandler,
-			MediaType.TEXT_PLAIN, textHandler);
+			MediaType.TEXT_PLAIN, textHandler, MediaType.TEXT_HTML, textHandler);
 
 	public static ReponseContentHandler standardHandler(String contentType) {
 		return standardHandlers.get(contentType);
