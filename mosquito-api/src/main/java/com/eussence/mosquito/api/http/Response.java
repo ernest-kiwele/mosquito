@@ -19,6 +19,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -59,6 +61,7 @@ public class Response {
 
 	private String errorMessage;
 
+	@JsonIgnore
 	private Throwable exception;
 
 //	public Response(int status, String statusReason, int contentLength, Body rawPayload, String uri,

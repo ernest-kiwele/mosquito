@@ -32,7 +32,7 @@ module com.eussence.mosquito.api {
 	requires transitive com.fasterxml.jackson.core;
 	requires transitive com.fasterxml.jackson.databind;
 	requires java.ws.rs;
-	requires lombok;
+	requires static lombok;
 	requires org.apache.commons.lang3;
 	requires transitive org.codehaus.groovy;
 	requires com.fasterxml.jackson.datatype.jsr310;
