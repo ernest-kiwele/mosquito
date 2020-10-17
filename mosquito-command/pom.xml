@@ -22,7 +22,7 @@
 		</dependency>
 		<dependency>
 			<groupId>com.eussence</groupId>
-			<artifactId>mosquito-http</artifactId>
+			<artifactId>mosquito-http-core</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>

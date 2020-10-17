@@ -38,13 +38,13 @@
 		<!-- okhttp -->
 		<dependency>
 			<groupId>${project.groupId}</groupId>
-			<artifactId>mosquito-http-okhttp</artifactId>
+			<artifactId>mosquito-http-core</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>com.eussence</groupId>
+			<groupId>${project.groupId}</groupId>
 			<artifactId>mosquito-http-okhttp</artifactId>
-			<version>1.0-SNAPSHOT</version>
+			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
 
