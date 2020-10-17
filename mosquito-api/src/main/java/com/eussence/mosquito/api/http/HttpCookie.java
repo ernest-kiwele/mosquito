@@ -55,8 +55,6 @@ public class HttpCookie {
 
 		Map<String, String> attributes = map(parts);
 
-		System.out.println("Cookie attributes: " + attributes);
-
 		var result = HttpCookie.builder()
 				.name(nameValuePair[0])
 				.value(nameValuePair[1])
