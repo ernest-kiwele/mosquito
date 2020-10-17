@@ -17,11 +17,13 @@ package com.eussence.mosquito.http.driver;
 
 import java.net.http.HttpResponse;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
 import com.eussence.mosquito.api.http.Body;
+import com.eussence.mosquito.api.http.HttpCookie;
 import com.eussence.mosquito.api.http.Response;
 import com.eussence.mosquito.http.api.StandardResponseHeaders;
 
@@ -102,12 +104,12 @@ public class StandardResponseFactory {
 		return null;
 	}
 
-	private Map<String, String> readCookies(HttpResponse<?> resp) {
+	private Map<String, HttpCookie> readCookies(HttpResponse<?> resp) {
 		return resp.headers()
 				.allValues(StandardResponseHeaders.COOKIE.getHeaderName())
 				.stream()
-				.map(s -> s.split("="))
-				.collect(Collectors.toMap(arr -> arr[0], arr -> arr[1], (c1, c2) -> c1));
+				.map(HttpCookie::forHeader)
+				.collect(Collectors.toMap(HttpCookie::getName, Function.identity()));
 	}
 
 	public Response create(Throwable exception) {

@@ -21,6 +21,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.core.MediaType;
@@ -28,6 +29,7 @@ import javax.ws.rs.core.MediaType;
 import org.apache.commons.lang3.StringUtils;
 
 import com.eussence.mosquito.api.http.Body;
+import com.eussence.mosquito.api.http.HttpCookie;
 import com.eussence.mosquito.api.http.Request;
 import com.eussence.mosquito.api.http.Response;
 
@@ -163,10 +165,11 @@ public class VertxHttpBridge {
 				.stream()
 				.collect(Collectors.groupingBy(Map.Entry::getKey,
 						Collectors.mapping(Map.Entry::getValue, Collectors.toList())));
-		Map<String, String> cookies = response.cookies()
+
+		Map<String, HttpCookie> cookies = response.cookies()
 				.stream()
-				.map(s -> s.split("="))
-				.collect(Collectors.toMap(arr -> arr[0], arr -> arr[1], (c1, c2) -> c1));
+				.map(HttpCookie::forHeader)
+				.collect(Collectors.toMap(HttpCookie::getName, Function.identity()));
 
 		Response.ResponseBuilder builder = Response.builder()
 				.status(response.statusCode())

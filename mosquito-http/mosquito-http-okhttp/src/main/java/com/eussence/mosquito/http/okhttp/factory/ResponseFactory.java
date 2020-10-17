@@ -16,18 +16,18 @@
 package com.eussence.mosquito.http.okhttp.factory;
 
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.core.Response.Status;
 
-import org.apache.commons.lang3.StringUtils;
-
 import com.eussence.mosquito.api.exception.CheckedExecutable;
+import com.eussence.mosquito.api.http.HttpCookie;
 import com.eussence.mosquito.api.http.Response;
+import com.eussence.mosquito.http.api.ContentTypeHandler;
 import com.eussence.mosquito.http.api.StandardResponseHeaders;
 import com.eussence.mosquito.http.api.common.ReponseContentHandler;
 import com.eussence.mosquito.http.okhttp.ResponseHolder;
@@ -54,12 +54,19 @@ public class ResponseFactory {
 		var httpResponse = httpResponseHolder.getResponse();
 
 		Map<String, List<String>> headers = httpResponse.headers()
-				.toMultimap();
-		String contentType = httpResponse.header(StandardResponseHeaders.CONTENT_TYPE.getHeaderName());
+				.toMultimap()
+				.entrySet()
+				.stream()
+				.map(m -> Map.entry(m.getKey()
+						.toLowerCase(), m.getValue()))
+				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+		String contentType = ContentTypeHandler
+				.extractMediaType(httpResponse.header(StandardResponseHeaders.CONTENT_TYPE.getHeaderName()));
 
 		return Response.builder()
 				.body(ReponseContentHandler.standardHandler(contentType)
-						.process(CheckedExecutable.wrap(() -> httpResponseHolder.getPayload()), headers))
+						.process(CheckedExecutable.wrap(httpResponseHolder::getPayload), headers))
 				.status(httpResponse.code())
 				.statusReason(Status.fromStatusCode(httpResponse.code())
 						.getReasonPhrase())
@@ -67,11 +74,15 @@ public class ResponseFactory {
 						.url()
 						.toString())
 				.headers(headers)
-				.cookies(this.readCookies(httpResponse))
+				.cookies(this.readCookies(headers))
 				.failed(false)
-				.duration(durationStartDate == null ? 0 : ChronoUnit.MILLIS.between(durationStartDate, Instant.now()))
-				.length(Integer.parseInt(StringUtils.firstNonBlank(
-						httpResponse.header(StandardResponseHeaders.CONTENT_LENGTH.getHeaderName()), "0")))
+				.duration(httpResponse.receivedResponseAtMillis())
+				.length(httpResponse.body()
+						.contentLength() < 0
+								? (httpResponseHolder.getPayload() == null ? "" : httpResponseHolder.getPayload())
+										.length()
+								: httpResponse.body()
+										.contentLength())
 				.build();
 	}
 
@@ -79,13 +90,12 @@ public class ResponseFactory {
 		return new Response(exception);
 	}
 
-	protected Map<String, String> readCookies(okhttp3.Response resp) {
-		return Optional.ofNullable(resp.headers()
-				.toMultimap()
-				.get(StandardResponseHeaders.COOKIE.getHeaderName()))
+	protected Map<String, HttpCookie> readCookies(Map<String, List<String>> headers) {
+		return Optional.ofNullable(headers.get(StandardResponseHeaders.COOKIE.getHeaderName()))
 				.stream()
 				.flatMap(List::stream)
-				.map(s -> s.split("="))
-				.collect(Collectors.toMap(arr -> arr[0], arr -> arr[1], (c1, c2) -> c1));
+				.map(HttpCookie::forHeader)
+				.collect(Collectors.toMap(HttpCookie::getName, Function.identity()));
 	}
+
 }

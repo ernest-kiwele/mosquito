@@ -25,12 +25,16 @@ import org.apache.commons.lang3.StringUtils;
  * @author Ernest Kiwele
  */
 public class ContentTypeHandler {
+
+	private ContentTypeHandler() {
+	}
+
 	public static boolean isTextContentType(String contentType) {
 		return contentType.startsWith("text/")
 				|| StringUtils.containsAny(contentType, MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML);
 	}
 
-//	public static Object parseEntity(Object body, String contentType) {
-//
-//	}
+	public static String extractMediaType(String contentTypeHeader) {
+		return contentTypeHeader.split(";")[0];
+	}
 }

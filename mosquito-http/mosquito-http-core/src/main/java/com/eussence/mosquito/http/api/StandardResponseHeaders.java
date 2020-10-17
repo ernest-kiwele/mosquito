@@ -23,15 +23,15 @@ package com.eussence.mosquito.http.api;
  */
 public enum StandardResponseHeaders {
 
-	CONTENT_TYPE("Content-Type"),
+	CONTENT_TYPE("content-type"),
 
-	CONTENT_LENGTH("Content-Length"),
+	CONTENT_LENGTH("content-length"),
 
-	DATE("Date"),
+	DATE("date"),
 
-	SERVER("Server"),
+	SERVER("server"),
 
-	COOKIE("Set-Cookie");
+	COOKIE("set-cookie");
 
 	private final String headerName;
 

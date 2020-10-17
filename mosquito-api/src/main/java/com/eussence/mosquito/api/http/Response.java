@@ -44,7 +44,7 @@ public class Response {
 
 	private String statusReason;
 
-	private int length;
+	private long length;
 
 	private Body body;
 
@@ -53,7 +53,8 @@ public class Response {
 	@Builder.Default
 	private Map<String, List<String>> headers = new HashMap<>();
 
-	private Map<String, String> cookies;
+	@Builder.Default
+	private Map<String, HttpCookie> cookies = new HashMap<>();
 
 	private boolean failed;
 
@@ -63,21 +64,6 @@ public class Response {
 
 	@JsonIgnore
 	private Throwable exception;
-
-//	public Response(int status, String statusReason, int contentLength, Body rawPayload, String uri,
-//			Map<String, String> headers, Map<String, String> cookies, long duration) {
-//		this.status = status;
-//		this.statusReason = statusReason;
-//		this.length = contentLength;
-//		this.body = rawPayload;
-//		this.uri = uri;
-//		this.headers = Collections.unmodifiableMap(headers);
-//		this.cookies = Collections.unmodifiableMap(cookies);
-//
-//		this.failed = false;
-//		this.exception = null;
-//		this.duration = duration;
-//	}
 
 	public Response(Throwable exception) {
 		this.status = 0;
