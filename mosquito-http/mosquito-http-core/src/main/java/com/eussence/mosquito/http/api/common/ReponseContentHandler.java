@@ -45,9 +45,8 @@ public interface ReponseContentHandler {
 			.charSet(extractCharSet(headers.get(StandardResponseHeaders.CONTENT_TYPE.getHeaderName())))
 			.build();
 
-	static final Map<String, ReponseContentHandler> standardHandlers = Map.of(MediaType.APPLICATION_JSON.toLowerCase(),
-			jsonHandler, MediaType.TEXT_PLAIN.toLowerCase(), textHandler, MediaType.TEXT_HTML.toLowerCase(),
-			textHandler);
+	static final Map<String, ReponseContentHandler> standardHandlers = Map.of(MediaType.APPLICATION_JSON, jsonHandler,
+			MediaType.TEXT_PLAIN, textHandler, MediaType.TEXT_HTML, textHandler);
 
 	public static ReponseContentHandler standardHandler(String contentType) {
 		return standardHandlers.get(contentType);
