@@ -21,7 +21,6 @@ import java.util.concurrent.CompletableFuture;
 import com.eussence.mosquito.api.exception.CheckedFunction;
 import com.eussence.mosquito.api.http.Request;
 import com.eussence.mosquito.api.http.Response;
-import com.eussence.mosquito.api.utils.JsonMapper;
 import com.eussence.mosquito.http.api.HttpDriver;
 import com.eussence.mosquito.http.okhttp.factory.ResponseFactory;
 
@@ -58,11 +57,5 @@ public class OkHttpDriver implements HttpDriver {
 
 	public CompletableFuture<Response> asyncHttp(Request request) {
 		return CompletableFuture.supplyAsync(() -> this.http(request));
-	}
-
-	public static void main(String... strings) {
-		System.out.println(JsonMapper.jsonPretty(instance.http(Request.builder()
-				.uri("http://localhost/")
-				.build())));
 	}
 }
