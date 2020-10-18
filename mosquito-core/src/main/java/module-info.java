@@ -28,4 +28,7 @@ module com.eussence.mosquito.core {
 	requires com.eussence.mosquito.http;
 	requires org.apache.commons.lang3;
 	requires vertx.core;
+
+	requires static lombok;
+	requires com.eussence.mosquito.command.wrapper;
 }

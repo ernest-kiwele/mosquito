@@ -30,6 +30,11 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>com.eussence</groupId>
+			<artifactId>mosquito-command-wrapper</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>org.jline</groupId>
 			<artifactId>jline</artifactId>
 			<version>3.7.1</version>

@@ -27,6 +27,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.eussence.mosquito.api.MapObject;
 import com.eussence.mosquito.api.utils.JsonMapper;
+import com.eussence.mosquito.command.wrapper.Ether;
 import com.eussence.mosquito.core.api.data.CacheProxy;
 import com.eussence.mosquito.core.internal.data.ClusteredCacheProxy;
 import com.eussence.mosquito.core.internal.data.LocalCacheProxy;

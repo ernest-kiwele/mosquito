@@ -18,7 +18,7 @@ package com.eussence.mosquito.client.cli;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Map;
+import java.util.Objects;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -38,14 +38,11 @@ import org.jline.utils.AttributedStringBuilder;
 import org.jline.utils.AttributedStyle;
 import org.jline.utils.InfoCmp.Capability;
 
-import com.eussence.mosquito.api.CallChain;
-import com.eussence.mosquito.api.data.Dataset;
-import com.eussence.mosquito.api.data.Environment;
-import com.eussence.mosquito.api.data.Vars;
 import com.eussence.mosquito.api.execution.LocalExecutionScheduler;
+import com.eussence.mosquito.api.http.Response;
 import com.eussence.mosquito.api.utils.JsonMapper;
 import com.eussence.mosquito.command.internal.GroovyResolver;
-import com.eussence.mosquito.core.api.Ether;
+import com.eussence.mosquito.command.wrapper.Ether;
 import com.eussence.mosquito.core.api.Mosquito;
 import com.eussence.mosquito.http.api.DefaultClient;
 import com.eussence.mosquito.http.api.HttpDriverFactory;
@@ -160,6 +157,18 @@ public class MosquitoCli {
 		}
 	}
 
+	private void newRequestWrapper(String name) {
+		this.ether.newRequest(Objects.requireNonNull(name));
+	}
+
+	private void setResponse(Response resp) {
+		this.ether.setResponse(resp);
+	}
+
+	private void setContext(String type) {
+		this.ether.put("contextType", type);
+	}
+
 	@SuppressWarnings("unchecked")
 	public String evaluateInput(String command) {
 		String output = null;
@@ -169,15 +178,27 @@ public class MosquitoCli {
 				Object val;
 
 				try {
-					// val = GroovyResolver.getInstance().eval(this.ether, command);
+					String contextType = (String) this.ether.get("contextType");
+					String delegate = null;
+					String delegatedCommand = command;
+					if (contextType != null) {
+						if ("request".equals(contextType) && null != this.ether.getRequest()) {
+							delegate = "req";
+						} else if ("response".equals(contextType) && null != this.ether.getResponse()) {
+							delegate = "response";
+						}
+
+						if (null != delegate) {
+							delegatedCommand = delegate + ".with{" + command + "}";
+						}
+					}
+
+					System.out.println("Evaluating <<" + delegatedCommand + ">>");
 
 					val = GroovyResolver.getInstance()
-							.eval(command,
-									(Environment) ((Map<String, Object>) this.ether.get("environments"))
-											.get(this.ether.get("_env")),
-									(Map<String, Dataset>) this.ether.get("datasets"),
-									(Map<String, Vars>) this.ether.get("vars"),
-									(Map<String, CallChain>) this.ether.get("callChains"), this.ether);
+							.eval(delegatedCommand, this.ether.getEnvironments()
+									.get(this.ether.get_env()), this.ether.getDataSets(), this.ether.getVars(),
+									this.ether.getCallChains(), this.ether);
 				} catch (groovy.lang.MissingPropertyException | groovy.lang.MissingMethodException ex) {
 					val = new AttributedStringBuilder()
 							.style(AttributedStyle.DEFAULT.foreground(AttributedStyle.MAGENTA))
@@ -203,6 +224,12 @@ public class MosquitoCli {
 				}
 
 				if (null != val) {
+
+					if (val instanceof Response) {
+						this.ether.setResponse((Response) val);
+						this.ether.setLastRequest(((Response) val).getRequest());
+					}
+
 					if (val instanceof String) {
 						output = (String) val;
 					} else if (val instanceof Number) {
@@ -326,8 +353,8 @@ public class MosquitoCli {
 			if ((trigger != null) && (line.compareTo(trigger) == 0))
 				line = reader.readLine("password> ", mask);
 
-			if (!StringUtils.startsWithAny(line, "quit", "exit", "cls", "error", "trace", "driver-info",
-					"list-drivers")) {
+			if (!StringUtils.startsWithAny(line, "quit", "exit", "cls", "error", "trace", "driver-info", "list-drivers",
+					"set-context", "mode-request", "mode-response", "send", "new-request")) {
 				String output = this.runCommand(line);
 				if (StringUtils.isNotBlank(output)) {
 					terminal.writer()
@@ -415,6 +442,58 @@ public class MosquitoCli {
 									.append("\"" + factory.getProvider() + "\""));
 				});
 				terminal.flush();
+
+			} else if (line.trim()
+					.toLowerCase()
+					.startsWith("set-context")) {
+				String[] parts = line.trim()
+						.split(" +");
+				if (parts.length < 2
+						|| !(parts[1].equalsIgnoreCase("request") || parts[1].equalsIgnoreCase("response"))) {
+					terminal.writer()
+							.println("|>> Usage: set-context request|response");
+					terminal.flush();
+					continue;
+				}
+				this.setContext(parts[1]);
+			} else if (line.trim()
+					.toLowerCase()
+					.startsWith("new-request")) {
+				String[] parts = line.trim()
+						.split(" +");
+				if (parts.length < 2
+						|| !(parts[1].equalsIgnoreCase("request") || parts[1].equalsIgnoreCase("response"))) {
+					terminal.writer()
+							.println("|>> Usage: new-request <request-name>");
+					terminal.flush();
+					continue;
+				}
+				this.newRequestWrapper(parts[1]);
+			} else if (line.trim()
+					.toLowerCase()
+					.equals("mode-request")) {
+				this.setContext("request");
+			} else if (line.trim()
+					.toLowerCase()
+					.equals("mode-response")) {
+				this.setContext("response");
+			} else if (line.trim()
+					.equalsIgnoreCase("send")) {
+				if (!this.ether.get("contextType")
+						.equals("request")) {
+					terminal.writer()
+							.println("|>> That can only be done in 'request' mode");
+					terminal.flush();
+					continue;
+				}
+				String output = this.runCommand("http(req.request)");
+				if (StringUtils.isNotBlank(output)) {
+					terminal.writer()
+							.println(output);
+					terminal.flush();
+				}
+
+				continue;
 			} else {
 				terminal.writer()
 						.println("I didn't get that... try again!");

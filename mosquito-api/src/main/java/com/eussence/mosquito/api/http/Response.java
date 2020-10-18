@@ -65,6 +65,9 @@ public class Response {
 	@JsonIgnore
 	private Throwable exception;
 
+	@JsonIgnore
+	private Request request;
+
 	public Response(Throwable exception) {
 		this.status = 0;
 		this.statusReason = null;

@@ -65,7 +65,10 @@ public class GroovyResolver implements Resolver {
 		try {
 			MapObject context = outerContext;
 			// context.putAll(outerContext);
-			context.add("env", environment.getVars()).add("data", datasets).add("vars", vars).add("chains", callChains);
+			context.add("env", environment.getVars())
+					.add("data", datasets)
+					.add("vars", vars)
+					.add("chains", callChains);
 			// overwriting...
 			context.putAll(vars);
 			context.putAll(datasets);
@@ -106,7 +109,8 @@ public class GroovyResolver implements Resolver {
 	@Override
 	public Map<String, Object> eval(MapObject context, Map<String, String> templates) {
 		this.setOnContext(context);
-		return templates.entrySet().stream()
+		return templates.entrySet()
+				.stream()
 				.map(entry -> new AbstractMap.SimpleEntry<>(entry.getKey(), this.eval(context, entry.getValue())))
 				.peek(System.out::println)
 				.collect(Collectors.toMap(entry -> (String) entry.getKey(), AbstractMap.SimpleEntry::getValue));

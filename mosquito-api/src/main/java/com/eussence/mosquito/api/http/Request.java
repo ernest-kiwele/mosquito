@@ -16,6 +16,7 @@
 package com.eussence.mosquito.api.http;
 
 import java.net.URI;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
@@ -48,10 +49,10 @@ public final class Request {
 	private HttpMethod method = HttpMethod.GET;
 
 	@Builder.Default
-	private Map<String, String> headers = Map.of();
+	private Map<String, String> headers = new HashMap<>();
 
 	@Builder.Default
-	private Map<String, String> parameters = Map.of();
+	private Map<String, String> parameters = new HashMap<>();
 
 	private Body body;
 
@@ -84,14 +85,14 @@ public final class Request {
 	}
 
 	public void applyParameters(BiConsumer<String, String> paramTaker) {
-		if (null == this.parameters && this.parameters.isEmpty())
+		if (null == this.parameters || this.parameters.isEmpty())
 			return;
 
 		this.parameters.forEach(paramTaker);
 	}
 
 	public void applyHeaders(BiConsumer<String, String> headerTaker) {
-		if (this.headers == null || this.headers.isEmpty())
+		if (null == this.headers || this.headers.isEmpty())
 			return;
 
 		this.headers.forEach(headerTaker);

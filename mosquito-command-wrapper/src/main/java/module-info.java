@@ -13,22 +13,14 @@
  */
 
 /**
- * Command-line client.
- * 
- * @author Ernest Kiwele
+ * @author ernest
+ *
  */
-module com.eussence.mosquito.client.cli {
-	exports com.eussence.mosquito.client.cli;
+module com.eussence.mosquito.command.wrapper {
+	exports com.eussence.mosquito.command.wrapper;
 
-	requires com.eussence.mosquito.command;
-	requires com.eussence.mosquito.core;
-	requires com.eussence.mosquito.api;
-
-	requires jline;
-	requires org.apache.commons.io;
-	requires org.apache.commons.lang3;
-	requires org.codehaus.groovy;
 	requires com.eussence.mosquito.http;
+	requires org.codehaus.groovy;
 
-	requires com.eussence.mosquito.command.wrapper;
+	requires static lombok;
 }

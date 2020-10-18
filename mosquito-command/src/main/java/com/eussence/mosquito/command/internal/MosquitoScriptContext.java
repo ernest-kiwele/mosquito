@@ -20,6 +20,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -110,16 +111,24 @@ public class MosquitoScriptContext extends Script {
 	}
 
 	protected Response http(Request input) {
-		return HttpDriverFactoryLocator.getInstance()
+
+		Arrays.stream(Thread.currentThread()
+				.getStackTrace())
+				.forEach(System.out::println);
+
+		Response resp = HttpDriverFactoryLocator.getInstance()
 				.getSelectedDriver()
 				.http(input);
+		resp.setRequest(input);
+
+		return resp;
 	}
 
-	protected Response get(GString uri) {
+	public Response get(GString uri) {
 		return this.get(uri);
 	}
 
-	protected Response get(String uri) {
+	public Response get(String uri) {
 		return this.http(Request.builder()
 				.uri(uri)
 				.method(HttpMethod.GET)
