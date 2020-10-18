@@ -227,7 +227,7 @@ public class MosquitoScriptContext extends Script {
 		try {
 			return IOUtils.toString(new File(path).toURI(), Charset.defaultCharset());
 		} catch (IOException ioe) {
-			throw new MosquitoException("Could not load file from $path: ${ioe.message}", ioe);
+			throw new MosquitoException("Could not load file from " + path + ": " + ioe.getMessage(), ioe);
 		}
 	}
 
