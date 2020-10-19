@@ -23,6 +23,7 @@ import com.eussence.mosquito.api.data.Vars
 import com.eussence.mosquito.api.http.Request
 import com.eussence.mosquito.api.http.Response
 import com.eussence.mosquito.http.api.DefaultClient
+import com.fasterxml.jackson.annotation.JsonIgnore
 
 /**
  * The ether is the execution context from which all commands are evaluated. It
@@ -30,7 +31,7 @@ import com.eussence.mosquito.http.api.DefaultClient
  * 
  * @author Ernest Kiwele
  */
-public class Ether extends MapObject  {
+public class Ether   {
 
 	private static final long serialVersionUID = -7825203213429363914L
 
@@ -44,6 +45,7 @@ public class Ether extends MapObject  {
 	private Map<String, Dataset> dataSets = [:]
 	private Map<String, Vars> vars = [:]
 	private String currentChain = "default"
+	@JsonIgnore
 	private DefaultClient client = DefaultClient.builder().build()
 	private String _env = "_dev"
 
@@ -52,10 +54,13 @@ public class Ether extends MapObject  {
 
 	private RequestWrapper req = new RequestWrapper()
 	private Request lastRequest = null
-	private Response response = null
+	private ResponseWrapper response = null
+
+	private String contextType = 'request'
+
+	private boolean allMapped = false
 
 	public Ether() {
-		super.put('contextType', 'request')
 	}
 
 	public enum EtherKey {
@@ -70,6 +75,24 @@ public class Ether extends MapObject  {
 		public String getKey() {
 			return key
 		}
+	}
+
+	public MapObject putAllFields() {
+		if(allMapped) {
+			return this
+		}
+
+		return MapObject.instance().add("callChains", callChains)
+				.add("environments", environments)
+				.add("dataSets", dataSets)
+				.add("vars", vars)
+				.add("currentChain", currentChain)
+				.add("client", client)
+				.add("_env", _env)
+				.add("req", req)
+				.add("lastRequest", lastRequest)
+				.add("response", response)
+				.add("contextType", contextType)
 	}
 
 	public void newRequest(String name) {
@@ -246,7 +269,7 @@ public class Ether extends MapObject  {
 	 * Get the value of response
 	 * @return the response
 	 */
-	public Response getResponse() {
+	public ResponseWrapper getResponse() {
 		return response
 	}
 
@@ -254,7 +277,7 @@ public class Ether extends MapObject  {
 	 * Set the value of response
 	 * @param response the response to set
 	 */
-	public void setResponse(Response response) {
+	public void setResponse(ResponseWrapper response) {
 		this.response = response
 	}
 
@@ -264,5 +287,12 @@ public class Ether extends MapObject  {
 
 	public void setLastRequest(Request lastRequest) {
 		this.lastRequest = lastRequest
+	}
+
+	public String getContextType() {
+		return contextType
+	}
+	public void setContextType(String contextType) {
+		this.contextType = contextType
 	}
 }

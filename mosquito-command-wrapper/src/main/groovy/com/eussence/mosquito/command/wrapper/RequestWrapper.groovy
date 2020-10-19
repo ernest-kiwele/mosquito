@@ -15,8 +15,13 @@
 
 package com.eussence.mosquito.command.wrapper
 
+import com.eussence.mosquito.api.AuthType
+import com.eussence.mosquito.api.http.AuthData
+import com.eussence.mosquito.api.http.Body
 import com.eussence.mosquito.api.http.HttpMethod
 import com.eussence.mosquito.api.http.Request
+import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonValue
 
 /**
  * A request factory is a client-focused version of a request builder, 
@@ -27,8 +32,9 @@ import com.eussence.mosquito.api.http.Request
  */
 class RequestWrapper {
 
+	@JsonValue
 	@Delegate
-	Request request
+	Request request = Request.builder().build()
 
 	String name = "_default"
 
@@ -75,5 +81,45 @@ class RequestWrapper {
 	RequestWrapper delete() {
 		request.method = HttpMethod.DELETE
 		this
+	}
+
+	// Quick builder-style setters for the command line
+	void uri(String u) {
+		this.request.uri = u
+	}
+
+	void method(HttpMethod meth) {
+		this.request.method = meth
+	}
+
+	void parameters(Map<String, String>  p) {
+		this.request.parameters = p
+	}
+
+	void body(Body b) {
+		this.request.body = b
+	}
+
+	void entity(Object e) {
+		Body b = this.request.body ?: Body.builder().build()
+		b.entity = e
+	}
+
+	Object payload() {
+		this.request.body?.entity
+	}
+
+	Object getPayload() {
+		this.payload()
+	}
+
+	void basicAuth(String user, String password) {
+		this.request.authType = AuthType.BASIC_AUTH
+		this.request.authData = AuthData.builder().username(user).headerName("Authorization").credentials(Base64.getEncoder().encodeToString("$user:$password".toString().bytes).toCharArray())
+	}
+
+	void bearer(String token) {
+		this.request.authType = AuthType.BEARER_TOKEN
+		this.request.authData = AuthData.builder().headerName("Authorization").credentials(token.toCharArray())
 	}
 }
