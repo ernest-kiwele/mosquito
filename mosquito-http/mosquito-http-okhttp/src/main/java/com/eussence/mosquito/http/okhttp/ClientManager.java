@@ -59,6 +59,10 @@ public class ClientManager {
 			case HEAD:
 				return this.bodyLessRequest(this.getClient(request), request.getUri(), request.getHeaders(),
 						request.getParameters(), request.getMethod(), bodyExtractor);
+			case POST:
+			case PUT:
+			case PATCH:
+				return this.bodiedRequest(this.getClient(request), request, bodyExtractor);
 			default:
 				throw new MosquitoException("Unsupported request method: " + request.getMethod());
 
@@ -95,7 +99,8 @@ public class ClientManager {
 		}
 	}
 
-	protected Response bodiedRequest(OkHttpClient client, Request req) {
+	protected <T> ResponseHolder<T> bodiedRequest(OkHttpClient client, Request req,
+			Function<ResponseBody, T> bodyExtractor) {
 
 		var request = new okhttp3.Request.Builder().url(this.appendQuery(req.getUri(), req.getParameters()));
 		request = this.setBodiedMethod(req.getBody(), req.getMethod(), request);
@@ -105,7 +110,10 @@ public class ClientManager {
 
 		try (Response response = client.newCall(request.build())
 				.execute()) {
-			return response;
+			return ResponseHolder.<T>builder()
+					.response(response)
+					.payload(bodyExtractor.apply(response.body()))
+					.build();
 		} catch (Exception e) {
 			throw new MosquitoException(e);
 		}
