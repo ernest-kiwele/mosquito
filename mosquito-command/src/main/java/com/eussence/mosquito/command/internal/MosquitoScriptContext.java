@@ -20,7 +20,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
+import java.time.Instant;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -111,11 +112,6 @@ public class MosquitoScriptContext extends Script {
 	}
 
 	protected Response http(Request input) {
-
-		Arrays.stream(Thread.currentThread()
-				.getStackTrace())
-				.forEach(System.out::println);
-
 		Response resp = HttpDriverFactoryLocator.getInstance()
 				.getSelectedDriver()
 				.http(input);
@@ -125,7 +121,7 @@ public class MosquitoScriptContext extends Script {
 	}
 
 	public Response get(GString uri) {
-		return this.get(uri);
+		return this.get(uri.toString());
 	}
 
 	public Response get(String uri) {
@@ -210,7 +206,8 @@ public class MosquitoScriptContext extends Script {
 		return System.getProperties();
 	}
 
-	protected Object propertyMissing(String name) {
+	public Object propertyMissing(String name) {
+		System.out.print("Property missing >> " + name);
 		throw new MissingPropertyException("I don't know of anything called '" + name + "'");
 	}
 
@@ -271,5 +268,14 @@ public class MosquitoScriptContext extends Script {
 			e.printStackTrace();
 			throw new MosquitoException(e);
 		}
+	}
+
+	// Date functions
+	protected Instant now() {
+		return Instant.now();
+	}
+
+	protected LocalDate today() {
+		return LocalDate.now();
 	}
 }

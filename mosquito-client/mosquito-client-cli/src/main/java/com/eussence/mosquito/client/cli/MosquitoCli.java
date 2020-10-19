@@ -15,9 +15,9 @@
 
 package com.eussence.mosquito.client.cli;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Objects;
 
 import org.apache.commons.io.IOUtils;
@@ -26,25 +26,27 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.jline.reader.Candidate;
 import org.jline.reader.Completer;
 import org.jline.reader.EndOfFileException;
+import org.jline.reader.History;
 import org.jline.reader.LineReader;
 import org.jline.reader.LineReaderBuilder;
 import org.jline.reader.MaskingCallback;
 import org.jline.reader.Parser;
 import org.jline.reader.UserInterruptException;
 import org.jline.reader.impl.DefaultParser;
+import org.jline.reader.impl.history.DefaultHistory;
 import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
 import org.jline.utils.AttributedStringBuilder;
 import org.jline.utils.AttributedStyle;
 import org.jline.utils.InfoCmp.Capability;
 
-import com.eussence.mosquito.api.execution.LocalExecutionScheduler;
+import com.eussence.mosquito.api.exception.MosquitoException;
 import com.eussence.mosquito.api.http.Response;
 import com.eussence.mosquito.api.utils.JsonMapper;
 import com.eussence.mosquito.command.internal.GroovyResolver;
 import com.eussence.mosquito.command.wrapper.Ether;
+import com.eussence.mosquito.command.wrapper.ResponseWrapper;
 import com.eussence.mosquito.core.api.Mosquito;
-import com.eussence.mosquito.http.api.DefaultClient;
 import com.eussence.mosquito.http.api.HttpDriverFactory;
 import com.eussence.mosquito.http.driver.HttpDriverFactoryLocator;
 
@@ -55,6 +57,9 @@ import com.eussence.mosquito.http.driver.HttpDriverFactoryLocator;
  */
 public class MosquitoCli {
 
+	private static final String ETHER_FILE_NAME = "ether.json";
+	private static final String HISTORY_FILE_NAME = "history";
+
 	private static final MosquitoCli instance = new MosquitoCli();
 	private static String[] args;
 
@@ -64,8 +69,13 @@ public class MosquitoCli {
 	private Mosquito mosquito;
 	private Ether ether;
 	private String lang = "groovy";
+	private String prompt;
 
 	private Throwable lastException;
+
+	// jline
+	private Terminal terminal;
+	private LineReader lineReader;
 
 	private MosquitoCli() {
 	}
@@ -76,9 +86,9 @@ public class MosquitoCli {
 
 	public void startup(boolean cli) {
 		this.mosquito = Mosquito.instance();
-		this.ether = this.mosquito.defaultEther();
-		this.ether.put("scheduler", LocalExecutionScheduler.instance(new ArrayList<>(),
-				f -> GroovyResolver.getInstance(), DefaultClient.builder()::build));
+		this.bootstrap();
+//		this.ether.put("scheduler", LocalExecutionScheduler.instance(new ArrayList<>(),
+//				f -> GroovyResolver.getInstance(), DefaultClient.builder()::build));
 
 		try {
 			if (cli)
@@ -135,7 +145,49 @@ public class MosquitoCli {
 		}
 	}
 
+	private void bootstrap() {
+		File configDir = this.getConfigDirectory();
+		File etherFile = new File(configDir, ETHER_FILE_NAME);
+
+		if (etherFile.exists()) {
+			try {
+				this.ether = JsonMapper.getObjectMapper()
+						.readValue(etherFile, Ether.class);
+			} catch (IOException e) {
+				System.out.println("|>> Failed to load your session file from '" + etherFile.getAbsolutePath() + ": "
+						+ e.getMessage()
+						+ "'\n|>> If this file is known to have invalid data, please delete and restart the program");
+				System.exit(1);
+			}
+		}
+
+		if (null == this.ether)
+			this.ether = this.mosquito.defaultEther();
+	}
+
+	private File getConfigDirectory() {
+		File configDirectory = this.configDirectory();
+		if (!configDirectory.exists()) {
+			configDirectory.mkdir();
+		}
+		return configDirectory;
+	}
+
+	private File configDirectory() {
+		return new File(System.getProperty("user.home") + File.separator + ".mosquito");
+	}
+
 	public void quit() {
+		File etherFile = new File(this.getConfigDirectory(), ETHER_FILE_NAME);
+		System.out.println("Storing session information to '" + etherFile.getAbsolutePath() + "'");
+
+		try {
+			JsonMapper.getPrettyobjectmapper()
+					.writeValue(etherFile, this.ether.putAllFields());
+		} catch (IOException e) {
+			System.out.println("Failed to write session data: " + e.getMessage());
+		}
+
 		System.out.println("Goodbye!");
 		System.exit(0);
 	}
@@ -162,11 +214,12 @@ public class MosquitoCli {
 	}
 
 	private void setResponse(Response resp) {
-		this.ether.setResponse(resp);
+		this.ether.setResponse(ResponseWrapper.of(resp));
 	}
 
 	private void setContext(String type) {
-		this.ether.put("contextType", type);
+		this.ether.setContextType(type);
+		this.prompt();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -178,7 +231,7 @@ public class MosquitoCli {
 				Object val;
 
 				try {
-					String contextType = (String) this.ether.get("contextType");
+					String contextType = (String) this.ether.getContextType();
 					String delegate = null;
 					String delegatedCommand = command;
 					if (contextType != null) {
@@ -193,12 +246,10 @@ public class MosquitoCli {
 						}
 					}
 
-					System.out.println("Evaluating <<" + delegatedCommand + ">>");
-
 					val = GroovyResolver.getInstance()
 							.eval(delegatedCommand, this.ether.getEnvironments()
 									.get(this.ether.get_env()), this.ether.getDataSets(), this.ether.getVars(),
-									this.ether.getCallChains(), this.ether);
+									this.ether.getCallChains(), this.ether.putAllFields());
 				} catch (groovy.lang.MissingPropertyException | groovy.lang.MissingMethodException ex) {
 					val = new AttributedStringBuilder()
 							.style(AttributedStyle.DEFAULT.foreground(AttributedStyle.MAGENTA))
@@ -226,7 +277,7 @@ public class MosquitoCli {
 				if (null != val) {
 
 					if (val instanceof Response) {
-						this.ether.setResponse((Response) val);
+						this.ether.setResponse(ResponseWrapper.of((Response) val));
 						this.ether.setLastRequest(((Response) val).getRequest());
 					}
 
@@ -276,15 +327,23 @@ public class MosquitoCli {
 		return b.toAnsi();
 	}
 
-	private void commandPrompt() throws Exception {
-
-		String prompt = new AttributedStringBuilder().append("mosquito:")
+	private String prompt() {
+		this.prompt = new AttributedStringBuilder().append("mosquito:")
 				.style(AttributedStyle.DEFAULT.foreground(AttributedStyle.BLUE))
 				.style(AttributedStyle.BOLD)
-				.append("groovy")
+				.append("groovy" + (this.ether.getContextType() != null ? "|" + this.ether.getContextType() : ""))
 				.style(AttributedStyle.DEFAULT)
 				.append("> ")
 				.toAnsi();
+
+		return this.prompt;
+	}
+
+	private LineReader getLineReader() {
+
+		if (null != this.lineReader) {
+			return this.lineReader;
+		}
 
 		String rightPrompt = null;
 		Character mask = null;
@@ -322,23 +381,36 @@ public class MosquitoCli {
 		parser = p;
 		// stuff
 
-		Terminal terminal;
 		try {
 			terminal = builder.build();
 		} catch (IOException e1) {
-			throw new RuntimeException(e1);
+			throw new MosquitoException(e1);
 		}
 
+		History history = new DefaultHistory();
+
 		LineReader reader = LineReaderBuilder.builder()
+				.history(history)
 				.terminal(terminal)
 				.completer(completer)
 				.parser(parser)
+				.variable(LineReader.HISTORY_FILE, new File(this.getConfigDirectory(), HISTORY_FILE_NAME))
 				.build();
+
+		this.lineReader = reader;
+
+		return this.lineReader;
+	}
+
+	private void commandPrompt() throws Exception {
+
+		LineReader reader = this.getLineReader();
 
 		while (true) {
 			String line = null;
 			try {
-				line = reader.readLine(prompt, rightPrompt, (MaskingCallback) null, null);
+				line = reader.readLine(this.prompt == null ? this.prompt() : this.prompt, null, (MaskingCallback) null,
+						null);
 			} catch (UserInterruptException e) {
 				// Ignore
 			} catch (EndOfFileException e) {
@@ -350,8 +422,8 @@ public class MosquitoCli {
 
 			line = line.trim();
 
-			if ((trigger != null) && (line.compareTo(trigger) == 0))
-				line = reader.readLine("password> ", mask);
+//			if ((trigger != null) && (line.compareTo(trigger) == 0))
+//				line = reader.readLine("password> ", mask);
 
 			if (!StringUtils.startsWithAny(line, "quit", "exit", "cls", "error", "trace", "driver-info", "list-drivers",
 					"set-context", "mode-request", "mode-response", "send", "new-request")) {
@@ -461,8 +533,7 @@ public class MosquitoCli {
 					.startsWith("new-request")) {
 				String[] parts = line.trim()
 						.split(" +");
-				if (parts.length < 2
-						|| !(parts[1].equalsIgnoreCase("request") || parts[1].equalsIgnoreCase("response"))) {
+				if (parts.length < 2) {
 					terminal.writer()
 							.println("|>> Usage: new-request <request-name>");
 					terminal.flush();
@@ -479,7 +550,7 @@ public class MosquitoCli {
 				this.setContext("response");
 			} else if (line.trim()
 					.equalsIgnoreCase("send")) {
-				if (!this.ether.get("contextType")
+				if (!this.ether.getContextType()
 						.equals("request")) {
 					terminal.writer()
 							.println("|>> That can only be done in 'request' mode");

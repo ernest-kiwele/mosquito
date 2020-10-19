@@ -15,11 +15,14 @@
 
 package com.eussence.mosquito.api.http;
 
+import lombok.Builder;
+
 /**
  * Authorization data.
  * 
  * @author Ernest Kiwele
  */
+@Builder
 public class AuthData {
 
 	private final String username;

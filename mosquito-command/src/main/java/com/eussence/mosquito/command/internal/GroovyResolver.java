@@ -29,6 +29,7 @@ import com.eussence.mosquito.api.command.Resolver;
 import com.eussence.mosquito.api.data.Dataset;
 import com.eussence.mosquito.api.data.Environment;
 import com.eussence.mosquito.api.data.Vars;
+import com.eussence.mosquito.api.exception.MosquitoException;
 
 import groovy.lang.Binding;
 import groovy.lang.GroovyShell;
@@ -83,7 +84,7 @@ public class GroovyResolver implements Resolver {
 
 			return script.run();
 		} catch (CompilationFailedException e) {
-			throw new RuntimeException("Invalid template: " + e.getMessage(), e);
+			throw new MosquitoException("Invalid template: " + e.getMessage(), e);
 		}
 	}
 

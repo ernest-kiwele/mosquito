@@ -30,6 +30,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
  * An object representing the HTTP call to be made.
@@ -37,6 +38,7 @@ import lombok.NoArgsConstructor;
  * @author Ernest Kiwele
  */
 @Getter
+@Setter
 @Builder
 
 @NoArgsConstructor
@@ -54,7 +56,9 @@ public final class Request {
 	@Builder.Default
 	private Map<String, String> parameters = new HashMap<>();
 
-	private Body body;
+	@Builder.Default
+	private Body body = Body.builder()
+			.build();
 
 	private AuthType authType;
 

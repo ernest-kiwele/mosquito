@@ -76,7 +76,7 @@ public class ResponseFactory {
 				.headers(headers)
 				.cookies(this.readCookies(headers))
 				.failed(false)
-				.duration(httpResponse.receivedResponseAtMillis())
+				.duration(httpResponse.receivedResponseAtMillis() - httpResponse.sentRequestAtMillis())
 				.length(httpResponse.body()
 						.contentLength() < 0
 								? (httpResponseHolder.getPayload() == null ? "" : httpResponseHolder.getPayload())

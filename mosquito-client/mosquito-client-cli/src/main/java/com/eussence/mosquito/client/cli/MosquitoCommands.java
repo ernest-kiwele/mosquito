@@ -15,11 +15,17 @@
 
 package com.eussence.mosquito.client.cli;
 
+import com.eussence.mosquito.api.utils.JsonMapper;
+import com.eussence.mosquito.command.wrapper.Ether;
+
 /**
  * Command library.
  * 
  * @author Ernest Kiwele
  */
 public class MosquitoCommands {
-
+	public static void main(String... args) throws Exception {
+		System.out.println(JsonMapper.getObjectMapper()
+				.writeValueAsString(new Ether().putAllFields()));
+	}
 }
