@@ -60,7 +60,7 @@ public class MosquitoCli {
 	private static final String ETHER_FILE_NAME = "ether.json";
 	private static final String HISTORY_FILE_NAME = "history";
 
-	private static final MosquitoCli instance = new MosquitoCli();
+	static final MosquitoCli instance = new MosquitoCli();
 	private static String[] args;
 
 	private boolean distributed;
@@ -222,7 +222,6 @@ public class MosquitoCli {
 		this.prompt();
 	}
 
-	@SuppressWarnings("unchecked")
 	public String evaluateInput(String command) {
 		String output = null;
 		switch (this.lang) {
@@ -402,172 +401,175 @@ public class MosquitoCli {
 		return this.lineReader;
 	}
 
-	private void commandPrompt() throws Exception {
-
-		LineReader reader = this.getLineReader();
-
-		while (true) {
-			String line = null;
-			try {
-				line = reader.readLine(this.prompt == null ? this.prompt() : this.prompt, null, (MaskingCallback) null,
-						null);
-			} catch (UserInterruptException e) {
-				// Ignore
-			} catch (EndOfFileException e) {
-				quit();
-			}
-
-			if (line == null)
-				continue;
-
-			line = line.trim();
-
-//			if ((trigger != null) && (line.compareTo(trigger) == 0))
-//				line = reader.readLine("password> ", mask);
-
-			if (!StringUtils.startsWithAny(line, "quit", "exit", "cls", "error", "trace", "driver-info", "list-drivers",
-					"set-context", "mode-request", "mode-response", "send", "new-request")) {
-				String output = this.runCommand(line);
-				if (StringUtils.isNotBlank(output)) {
-					terminal.writer()
-							.println(output);
-					terminal.flush();
-				}
-
-				continue;
-			}
-
-			if (line.equalsIgnoreCase("quit") || line.equalsIgnoreCase("exit")) {
-				this.quit();
-			} else if ("cls".equalsIgnoreCase(line)) {
-				terminal.puts(Capability.clear_screen);
-				terminal.flush();
-			} else if ("error".equalsIgnoreCase(line)) {
-				if (null != this.lastException) {
-					terminal.writer()
-							.println(new AttributedStringBuilder()
-									.style(AttributedStyle.DEFAULT.foreground(AttributedStyle.RED))
+	void error(String line, Terminal terminal, Ether ether) {
+		if (null != this.lastException) {
+			terminal.writer()
+					.println(
+							new AttributedStringBuilder().style(AttributedStyle.DEFAULT.foreground(AttributedStyle.RED))
 									.style(AttributedStyle.BOLD)
 									.append(this.lastException.getClass()
 											.getName() + ": ")
 									.style(AttributedStyle.DEFAULT.foreground(AttributedStyle.MAGENTA))
 									.append(this.lastException.getMessage())
 									.toAnsi());
-				} else {
-					terminal.writer()
-							.println("[Nothing to show]");
-				}
-				terminal.flush();
-			} else if ("trace".equalsIgnoreCase(line)) {
-				if (null != this.lastException) {
-					String ex = new AttributedStringBuilder()
-							.style(AttributedStyle.DEFAULT.foreground(AttributedStyle.RED))
-							.append(ExceptionUtils.getStackTrace(this.lastException))
-							.toAnsi();
+		} else {
+			terminal.writer()
+					.println("[Nothing to show]");
+		}
 
-					terminal.writer()
-							.println(ex);
-				} else {
-					terminal.writer()
-							.println("[Nothing to show]");
-				}
-				terminal.flush();
-			} else if ("driver-info".equalsIgnoreCase(line)) {
-				HttpDriverFactory factory = HttpDriverFactoryLocator.getInstance()
-						.getSelectedFactory();
+		terminal.flush();
+	}
 
-				terminal.writer()
-						.println(new AttributedStringBuilder().style(AttributedStyle.DEFAULT)
-								.append(StringUtils.rightPad("Driver name:", 15))
-								.style(AttributedStyle.DEFAULT.foreground(AttributedStyle.MAGENTA))
-								.append(factory.getName()));
-				terminal.writer()
-						.println(new AttributedStringBuilder().style(AttributedStyle.DEFAULT)
-								.append(StringUtils.rightPad("Provided by:", 15))
-								.style(AttributedStyle.DEFAULT.foreground(AttributedStyle.MAGENTA))
-								.append(factory.getProvider()));
-				terminal.writer()
-						.println(new AttributedStringBuilder().style(AttributedStyle.DEFAULT)
-								.append(StringUtils.rightPad("Description:", 15))
-								.style(AttributedStyle.DEFAULT.foreground(AttributedStyle.MAGENTA))
-								.append(factory.getDescription()));
-				terminal.writer()
-						.println(new AttributedStringBuilder().style(AttributedStyle.DEFAULT)
-								.append(StringUtils.rightPad("Features:", 15)));
-				terminal.writer()
-						.println(new AttributedStringBuilder()
-								.style(AttributedStyle.DEFAULT.foreground(AttributedStyle.MAGENTA))
+	void clearScreen(String line, Terminal terminal, Ether ether) {
+		terminal.puts(Capability.clear_screen);
+		terminal.flush();
+	}
+
+	void trace(String line, Terminal terminal, Ether ether) {
+		if (null != this.lastException) {
+			String ex = new AttributedStringBuilder().style(AttributedStyle.DEFAULT.foreground(AttributedStyle.RED))
+					.append(ExceptionUtils.getStackTrace(this.lastException))
+					.toAnsi();
+
+			terminal.writer()
+					.println(ex);
+		} else {
+			terminal.writer()
+					.println("[Nothing to show]");
+		}
+
+		terminal.flush();
+	}
+
+	void driver(String line, Terminal terminal, Ether ether) {
+		HttpDriverFactory factory = HttpDriverFactoryLocator.getInstance()
+				.getSelectedFactory();
+
+		terminal.writer()
+				.println(new AttributedStringBuilder().style(AttributedStyle.DEFAULT)
+						.append(StringUtils.rightPad("Driver name:", 15))
+						.style(AttributedStyle.DEFAULT.foreground(AttributedStyle.MAGENTA))
+						.append(factory.getName()));
+		terminal.writer()
+				.println(new AttributedStringBuilder().style(AttributedStyle.DEFAULT)
+						.append(StringUtils.rightPad("Provided by:", 15))
+						.style(AttributedStyle.DEFAULT.foreground(AttributedStyle.MAGENTA))
+						.append(factory.getProvider()));
+		terminal.writer()
+				.println(new AttributedStringBuilder().style(AttributedStyle.DEFAULT)
+						.append(StringUtils.rightPad("Description:", 15))
+						.style(AttributedStyle.DEFAULT.foreground(AttributedStyle.MAGENTA))
+						.append(factory.getDescription()));
+		terminal.writer()
+				.println(new AttributedStringBuilder().style(AttributedStyle.DEFAULT)
+						.append(StringUtils.rightPad("Features:", 15)));
+		terminal.writer()
+				.println(
+						new AttributedStringBuilder().style(AttributedStyle.DEFAULT.foreground(AttributedStyle.MAGENTA))
 								.append(factory.getFeaturesDescription()));
-				terminal.flush();
-			} else if ("list-drivers".equalsIgnoreCase(line)) {
-				var services = HttpDriverFactoryLocator.getInstance()
-						.listServices();
+		terminal.flush();
+	}
 
-				services.forEach(factory -> {
-					terminal.writer()
-							.println(new AttributedStringBuilder()
-									.style(AttributedStyle.DEFAULT.foreground(AttributedStyle.MAGENTA))
-									.append("\"" + factory.getName() + "\"")
-									.style(AttributedStyle.DEFAULT)
-									.append(StringUtils.rightPad(", provided by ", 15))
-									.style(AttributedStyle.DEFAULT.foreground(AttributedStyle.MAGENTA))
-									.append("\"" + factory.getProvider() + "\""));
-				});
-				terminal.flush();
+	void drivers(String line, Terminal terminal, Ether ether) {
+		var services = HttpDriverFactoryLocator.getInstance()
+				.listServices();
 
-			} else if (line.trim()
-					.toLowerCase()
-					.startsWith("set-context")) {
-				String[] parts = line.trim()
-						.split(" +");
-				if (parts.length < 2
-						|| !(parts[1].equalsIgnoreCase("request") || parts[1].equalsIgnoreCase("response"))) {
-					terminal.writer()
-							.println("|>> Usage: set-context request|response");
-					terminal.flush();
-					continue;
-				}
-				this.setContext(parts[1]);
-			} else if (line.trim()
-					.toLowerCase()
-					.startsWith("new-request")) {
-				String[] parts = line.trim()
-						.split(" +");
-				if (parts.length < 2) {
-					terminal.writer()
-							.println("|>> Usage: new-request <request-name>");
-					terminal.flush();
-					continue;
-				}
-				this.newRequestWrapper(parts[1]);
-			} else if (line.trim()
-					.toLowerCase()
-					.equals("mode-request")) {
-				this.setContext("request");
-			} else if (line.trim()
-					.toLowerCase()
-					.equals("mode-response")) {
-				this.setContext("response");
-			} else if (line.trim()
-					.equalsIgnoreCase("send")) {
-				if (!this.ether.getContextType()
-						.equals("request")) {
-					terminal.writer()
-							.println("|>> That can only be done in 'request' mode");
-					terminal.flush();
-					continue;
-				}
-				String output = this.runCommand("http(req.request)");
-				if (StringUtils.isNotBlank(output)) {
-					terminal.writer()
-							.println(output);
-					terminal.flush();
-				}
+		services.forEach(factory -> {
+			terminal.writer()
+					.println(new AttributedStringBuilder()
+							.style(AttributedStyle.DEFAULT.foreground(AttributedStyle.MAGENTA))
+							.append("\"" + factory.getName() + "\"")
+							.style(AttributedStyle.DEFAULT)
+							.append(StringUtils.rightPad(", provided by ", 15))
+							.style(AttributedStyle.DEFAULT.foreground(AttributedStyle.MAGENTA))
+							.append("\"" + factory.getProvider() + "\""));
+		});
+		terminal.flush();
+	}
 
+	void setContextCommand(String line, Terminal terminal, Ether ether) {
+		String[] parts = line.trim()
+				.split(" +");
+		if (parts.length < 2 || !(parts[1].equalsIgnoreCase("request") || parts[1].equalsIgnoreCase("response"))) {
+			terminal.writer()
+					.println("|>> Usage: set-context request|response");
+			terminal.flush();
+			return;
+		}
+
+		this.setContext(parts[1]);
+	}
+
+	void modeRequest(String line, Terminal terminal, Ether ether) {
+		this.setContext("request");
+	}
+
+	void modeResponse(String line, Terminal terminal, Ether ether) {
+		this.setContext("response");
+	}
+
+	void newRequest(String line, Terminal terminal, Ether ether) {
+		String[] parts = line.trim()
+				.split(" +");
+		if (parts.length < 2) {
+			terminal.writer()
+					.println("|>> Usage: new-request <request-name>");
+			terminal.flush();
+		}
+
+		this.newRequestWrapper(parts[1]);
+	}
+
+	void send(String command, Terminal terminal, Ether ether) {
+		if (!this.ether.getContextType()
+				.equals("request")) {
+			terminal.writer()
+					.println("|>> That can only be done in 'request' mode");
+			terminal.flush();
+			return;
+		}
+
+		String output = this.runCommand("http(req.request)");
+		if (StringUtils.isNotBlank(output)) {
+			terminal.writer()
+					.println(output);
+			terminal.flush();
+		}
+	}
+
+	private void commandPrompt() throws Exception {
+
+		LineReader reader = this.getLineReader();
+		while (true) {
+			final String line;
+			try {
+				line = StringUtils.trim(reader.readLine(this.prompt == null ? this.prompt() : this.prompt, null,
+						(MaskingCallback) null, null));
+			} catch (UserInterruptException e) {
+				// Ignore
 				continue;
-			} else {
+			} catch (EndOfFileException e) {
+				quit();
+				break;
+			}
+
+			if (line == null)
+				continue;
+
+			BuiltInCommand builtInCommand = BuiltInCommand.of(line)
+					.or(() -> BuiltInCommand.match(line))
+					.orElse(null);
+
+			if (null != builtInCommand) {
+				builtInCommand.getProcessor()
+						.process(line, terminal, ether);
+				continue;
+			}
+
+			String output = this.runCommand(line);
+			if (StringUtils.isNotBlank(output)) {
 				terminal.writer()
-						.println("I didn't get that... try again!");
+						.println(output);
 				terminal.flush();
 			}
 		}

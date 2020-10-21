@@ -49,8 +49,8 @@ public class Ether   {
 	private DefaultClient client = DefaultClient.builder().build()
 	private String _env = "_dev"
 
-	private Map<String, RequestWrapper> requests = [:]
-	private Map<String, Response> responses = [:]
+	private Map<String, RequestWrapper> requests = CappedHashMap.<RequestWrapper>instance(5)
+	private Map<String, Response> responses = CappedHashMap.<Response>instance(5)
 
 	private RequestWrapper req = new RequestWrapper()
 	private Request lastRequest = null
