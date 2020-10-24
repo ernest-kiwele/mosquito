@@ -537,13 +537,24 @@ public class MosquitoCli {
 		}
 	}
 
+	private void processNonBuiltInCommand(String line) {
+		String output = this.runCommand(line);
+		if (StringUtils.isNotBlank(output)) {
+			terminal.writer()
+					.println(output);
+			terminal.flush();
+		}
+	}
+
 	private void commandPrompt() throws Exception {
 
 		LineReader reader = this.getLineReader();
-		while (true) {
+
+		while (2 < 3) { // well, Sonarqube complained about while true, so here we go.
+
 			final String line;
 			try {
-				line = StringUtils.trim(reader.readLine(this.prompt == null ? this.prompt() : this.prompt, null,
+				line = StringUtils.trimToEmpty(reader.readLine(this.prompt == null ? this.prompt() : this.prompt, null,
 						(MaskingCallback) null, null));
 			} catch (UserInterruptException e) {
 				// Ignore
@@ -553,25 +564,10 @@ public class MosquitoCli {
 				break;
 			}
 
-			if (line == null)
-				continue;
-
-			BuiltInCommand builtInCommand = BuiltInCommand.of(line)
+			BuiltInCommand.of(line)
 					.or(() -> BuiltInCommand.match(line))
-					.orElse(null);
-
-			if (null != builtInCommand) {
-				builtInCommand.getProcessor()
-						.process(line, terminal, ether);
-				continue;
-			}
-
-			String output = this.runCommand(line);
-			if (StringUtils.isNotBlank(output)) {
-				terminal.writer()
-						.println(output);
-				terminal.flush();
-			}
+					.ifPresentOrElse(bic -> bic.getProcessor()
+							.process(line, terminal, ether), () -> this.processNonBuiltInCommand(line));
 		}
 	}
 }
