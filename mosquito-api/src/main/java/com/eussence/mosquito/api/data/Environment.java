@@ -15,10 +15,9 @@
 
 package com.eussence.mosquito.api.data;
 
-import java.util.Date;
-
-import com.eussence.mosquito.api.MapObject;
-import com.fasterxml.jackson.annotation.JsonFormat;
+import java.time.Instant;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -53,9 +52,10 @@ public class Environment {
 	private String scope;
 
 	@Builder.Default
-	private MapObject vars = new MapObject();
+	private Map<String, Object> vars = new LinkedHashMap<>();
 
 	private String createdBy;
-	@JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ssXXX")
-	private Date dateCreated;
+
+	@Builder.Default
+	private Instant dateCreated = Instant.now();
 }

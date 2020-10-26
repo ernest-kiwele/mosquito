@@ -13,35 +13,34 @@
  * limitations under the License.
  */
 
-package com.eussence.mosquito.api.data;
-
-import java.time.Instant;
-
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+package com.eussence.mosquito.api.command;
 
 /**
- * A dataset defines information to be used in a test. It can optionally contain
- * dynamically resolved information through templating and mapping.
+ * A list of languages used for interpreted commands.
  * 
  * @author Ernest Kiwele
  */
-@Builder
-@Getter
-@Setter
-public class Dataset {
+public enum CommandLanguage {
 
-	private String id;
-	private String name;
-	private String description;
-	private String comments;
+	GROOVY("Groovy", "grv"),
 
-	private String createdBy;
+	JAVASCRIPT("JavaScript", "js"),
 
-	@Builder.Default
-	private Instant dateCreated = Instant.now();
+	PYTHON("Python", "py");
 
-	private String mediaType;
-	private String uri;
+	private final String key;
+	private final String abbreviation;
+
+	CommandLanguage(String key, String abbreviation) {
+		this.key = key;
+		this.abbreviation = abbreviation;
+	}
+
+	public String getKey() {
+		return key;
+	}
+
+	public String getAbbreviation() {
+		return abbreviation;
+	}
 }
