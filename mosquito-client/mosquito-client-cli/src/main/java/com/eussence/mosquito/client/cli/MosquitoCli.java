@@ -40,6 +40,7 @@ import org.jline.utils.AttributedStringBuilder;
 import org.jline.utils.AttributedStyle;
 import org.jline.utils.InfoCmp.Capability;
 
+import com.eussence.mosquito.api.command.CommandLanguage;
 import com.eussence.mosquito.api.exception.MosquitoException;
 import com.eussence.mosquito.api.http.Response;
 import com.eussence.mosquito.api.utils.JsonMapper;
@@ -68,7 +69,7 @@ public class MosquitoCli {
 
 	private Mosquito mosquito;
 	private Ether ether;
-	private String lang = "groovy";
+	private CommandLanguage lang = CommandLanguage.GROOVY;
 	private String prompt;
 
 	private Throwable lastException;
@@ -225,7 +226,7 @@ public class MosquitoCli {
 	public String evaluateInput(String command) {
 		String output = null;
 		switch (this.lang) {
-			case "groovy": {
+			case GROOVY: {
 
 				Object val;
 
