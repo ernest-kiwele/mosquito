@@ -112,7 +112,7 @@ public class MosquitoScriptContext extends Script {
 	}
 
 	protected Response http(Request input) {
-		Response resp = HttpDriverFactoryLocator.getInstance()
+		var resp = HttpDriverFactoryLocator.getInstance()
 				.getSelectedDriver()
 				.http(input);
 		resp.setRequest(input);

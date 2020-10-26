@@ -12,7 +12,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.eussence.mosquito.command.wrapper
 
 import com.eussence.mosquito.api.CallChain
@@ -31,7 +30,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore
  * 
  * @author Ernest Kiwele
  */
-public class Ether   {
+public class Ether {
 
 	private static final long serialVersionUID = -7825203213429363914L
 
@@ -42,8 +41,9 @@ public class Ether   {
 		.vars(MapObject.instance()
 		.add("hello", "World"))
 		.build()]
+
 	private Map<String, Dataset> dataSets = [:]
-	private Map<String, Vars> vars = [:]
+	private Map<String, Object> vars = [:]
 	private String currentChain = "default"
 	@JsonIgnore
 	private DefaultClient client = DefaultClient.builder().build()
@@ -77,7 +77,7 @@ public class Ether   {
 		}
 	}
 
-	public MapObject putAllFields() {
+	public Ether putAllFields() {
 		if(allMapped) {
 			return this
 		}
