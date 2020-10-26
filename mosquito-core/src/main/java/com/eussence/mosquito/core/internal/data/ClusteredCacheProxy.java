@@ -17,6 +17,8 @@ package com.eussence.mosquito.core.internal.data;
 
 import java.util.concurrent.CompletableFuture;
 
+import com.eussence.mosquito.api.exception.MosquitoException;
+import com.eussence.mosquito.api.utils.JsonMapper;
 import com.eussence.mosquito.core.api.data.CacheProxy;
 
 import io.vertx.core.Vertx;
@@ -36,12 +38,13 @@ public class ClusteredCacheProxy implements CacheProxy {
 
 	public static ClusteredCacheProxy init(Vertx vertx) {
 		ClusteredCacheProxy cp = new ClusteredCacheProxy();
-		CompletableFuture<Void> f = new CompletableFuture<Void>();
+		CompletableFuture<Void> f = new CompletableFuture<>();
 
-		vertx.sharedData().getClusterWideMap(SHARED_DATA_MAP, res -> {
-			cp.clusterCache = res.result();
-			f.complete(null);
-		});
+		vertx.sharedData()
+				.getClusterWideMap(SHARED_DATA_MAP, res -> {
+					cp.clusterCache = res.result();
+					f.complete(null);
+				});
 
 		f.join();
 		return cp;
@@ -49,7 +52,7 @@ public class ClusteredCacheProxy implements CacheProxy {
 
 	@Override
 	public void put(String key, Object val) {
-		CompletableFuture<Void> f = new CompletableFuture<Void>();
+		CompletableFuture<Void> f = new CompletableFuture<>();
 		this.clusterCache.put(key, val, res -> {
 			if (res.succeeded()) {
 				f.complete(null);
@@ -58,8 +61,9 @@ public class ClusteredCacheProxy implements CacheProxy {
 			}
 		});
 		f.exceptionally(ex -> {
-			throw new RuntimeException(ex);
-		}).join();
+			throw new MosquitoException(ex);
+		})
+				.join();
 	}
 
 	@Override
@@ -68,7 +72,7 @@ public class ClusteredCacheProxy implements CacheProxy {
 
 		this.clusterCache.get(key, res -> {
 			if (res.succeeded()) {
-				f.complete(this.fromJson((String) res.result(), valueClass));
+				f.complete(JsonMapper.fromJson((String) res.result(), valueClass));
 			} else {
 				f.completeExceptionally(res.cause());
 			}
@@ -80,7 +84,7 @@ public class ClusteredCacheProxy implements CacheProxy {
 	@Override
 	public CompletableFuture<Void> putAsync(String key, Object val) {
 
-		CompletableFuture<Void> f = new CompletableFuture<Void>();
+		CompletableFuture<Void> f = new CompletableFuture<>();
 
 		this.clusterCache.put(key, val, res -> {
 			if (res.succeeded()) {

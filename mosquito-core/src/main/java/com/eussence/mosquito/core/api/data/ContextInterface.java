@@ -15,21 +15,32 @@
 
 package com.eussence.mosquito.core.api.data;
 
-import java.util.concurrent.CompletableFuture;
+import java.util.List;
+
+import com.eussence.mosquito.api.data.Dataset;
+import com.eussence.mosquito.api.data.Environment;
+import com.eussence.mosquito.command.wrapper.Ether;
 
 /**
- * An concrete cache proxy provides access to data meant to be cached and used
- * during execution of call chains.
+ * A facade for provkeying data sensitive to execution contexts.
  * 
  * @author Ernest Kiwele
  */
-public interface CacheProxy {
+public interface ContextInterface {
 
-	void put(String key, Object val);
+	Ether ether(String key);
 
-	<T> T get(String key, Class<T> valueClass);
+	List<String> listEthers();
 
-	CompletableFuture<Void> putAsync(String key, Object val);
+	void persistEther(String key);
 
-	<T> CompletableFuture<T> getAsync(String key);
+	Environment environment(String key);
+
+	List<String> listEnvironments();
+
+	void persistEnvironment(String key);
+
+	Dataset dataset(String key);
+
+	List<Dataset> listDatasets();
 }

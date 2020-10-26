@@ -17,109 +17,93 @@ package com.eussence.mosquito.core.api;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Queue;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.stream.Stream;
-
-import org.apache.commons.lang3.StringUtils;
+import java.util.function.Consumer;
 
 import com.eussence.mosquito.api.MapObject;
+import com.eussence.mosquito.api.exception.MosquitoException;
 import com.eussence.mosquito.api.utils.JsonMapper;
 import com.eussence.mosquito.command.wrapper.Ether;
 import com.eussence.mosquito.core.api.data.CacheProxy;
+import com.eussence.mosquito.core.api.data.ContextInterface;
+import com.eussence.mosquito.core.api.execution.MosquitoScheduler;
 import com.eussence.mosquito.core.internal.data.ClusteredCacheProxy;
+import com.eussence.mosquito.core.internal.data.ConfigManager;
 import com.eussence.mosquito.core.internal.data.LocalCacheProxy;
 
 import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
+import lombok.Builder;
+import lombok.Getter;
 
 /**
  * The entry point to the Mosquito service call API.
  * 
  * @author Ernest Kiwele
  */
+@Builder
+@Getter
 public class Mosquito {
+	public static final int DEFAULT_QUEUE_CAPACITY = 256;
+
+	private Queue<MosquitoLogEntry> logQueue;
+	private MosquitoLogger mosquitoLogger;
+	@Builder.Default
+	private List<Consumer<MosquitoLogEntry>> logListeners = new ArrayList<>();
 
 	private Vertx vertx;
 	private boolean distributed;
 
+	@Builder.Default
 	private Map<String, Object> config = new HashMap<>();
-
 	private String clusterAddress;
 
 	private CacheProxy cacheProxy;
+	private ContextInterface contextInterface;
+	private MosquitoScheduler scheduler;
 
 	public static Mosquito instance() {
-		Mosquito m = new Mosquito();
-
-		m.distributed = false;
-
-		m.loadConfig();
-		m.init();
-
-		return m;
+		return Mosquito.builder()
+				.distributed(false)
+				.config(ConfigManager.getInstance()
+						.loadConfig())
+				.build()
+				.init();
 	}
 
 	public void shutdown() {
-	}
-
-	private void loadConfig() {
-		String configPath = System.getProperty("config.file");
-		try {
-			if (!StringUtils.isNotBlank(configPath)) {
-				configPath = System.getProperty("user.home") + "/.mosquito/mosquito.config.json";
-			}
-
-			File f = new File(configPath);
-			if (f.exists() && f.isFile()) {
-				this.config.putAll(JsonMapper.getObjectMapper()
-						.readValue(f, Map.class));
-			} else {
-				System.out.println("Failed to locate config file. Creating one.");
-				File file = new File(System.getProperty("user.home") + "/.mosquito/");
-				file.mkdirs();
-
-				Map<String, Object> defaults = this.defaultConfig();
-				JsonMapper.getObjectMapper()
-						.writeValue(new File(System.getProperty("user.home") + "/.mosquito/mosquito.config.json"),
-								defaults);
-			}
-		} catch (IOException e) {
-			throw new RuntimeException("Could not load configuration from specified location: " + e.getMessage(), e);
-		}
-	}
-
-	private Map<String, Object> defaultConfig() {
-		Map<String, Object> c = new HashMap<>();
-
-		c.put("ws.dir", System.getProperty("user.home") + "/.mosquito/workspaces/");
-		c.put("label", "_default_");
-
-		return c;
+		this.vertx.close();
 	}
 
 	public static Mosquito distributedMosquito(String address) {
-		Mosquito m = new Mosquito();
-
-		m.distributed = true;
-		m.clusterAddress = address;
-
-		return m;
+		return Mosquito.builder()
+				.distributed(true)
+				.clusterAddress(address)
+				.build();
 	}
 
-	private void init() {
+	private Mosquito init() {
 		if (this.distributed) {
 			this.initDistributed();
 		} else {
 			this.initStandalone();
 		}
+
+		return this;
 	}
 
 	private void initStandalone() {
 		this.vertx = Vertx.vertx();
-		this.cacheProxy = LocalCacheProxy.init(vertx);// = this.vertx.sharedData().getLocalMap(SHARED_DATA_MAP);
+		this.cacheProxy = LocalCacheProxy.init(vertx);
+		this.logQueue = new ArrayBlockingQueue<>(DEFAULT_QUEUE_CAPACITY);
+		this.mosquitoLogger = (source, type, message) -> this.logQueue
+				.add(MosquitoLogger.logEntry(source, type, message));
 	}
 
 	private void initDistributed() {
@@ -138,16 +122,17 @@ public class Mosquito {
 			}
 		});
 
-		f.thenApply(vertx -> {
-			this.vertx = vertx;
+		f.thenApply(v -> {
+			this.vertx = v;
 			return this.vertx;
 		})
-				.thenAccept(vertx -> this.cacheProxy = ClusteredCacheProxy.init(vertx))
+				.thenAccept(v -> this.cacheProxy = ClusteredCacheProxy.init(v))
 				.join();
-	}
 
-	public CacheProxy getCacheProxy() {
-		return cacheProxy;
+		// TODO: change to a distributed queue
+		this.logQueue = new ArrayBlockingQueue<>(DEFAULT_QUEUE_CAPACITY);
+		this.mosquitoLogger = (source, type, message) -> this.logQueue
+				.add(MosquitoLogger.logEntry(source, type, message));
 	}
 
 	private File etherFile(String label) {
@@ -160,7 +145,7 @@ public class Mosquito {
 			JsonMapper.getObjectMapper()
 					.writeValue(etherFile(label), data);
 		} catch (IOException e) {
-			throw new RuntimeException("Could not snapshot '" + label + "': " + e.getMessage(), e);
+			throw new MosquitoException("Could not snapshot '" + label + "': " + e.getMessage(), e);
 		}
 	}
 
@@ -174,15 +159,13 @@ public class Mosquito {
 				return new Ether();
 			}
 		} catch (IOException e) {
-			throw new RuntimeException("Could not load ether file for label " + label, e);
+			throw new MosquitoException("Could not load ether file for label " + label, e);
 		}
 	}
 
 	public Ether defaultEther() {
 		if (this.config.get("label") != null) {
-			Ether ether = this.loadEther((String) this.config.get("label"));
-
-			return ether;
+			return this.loadEther((String) this.config.get("label"));
 		}
 
 		return new Ether();
@@ -192,24 +175,12 @@ public class Mosquito {
 		return config;
 	}
 
-	public static void main(String[] args) {
-		AtomicLong l = new AtomicLong();
-		Stream<Long> stream = Stream.generate(() -> {
-			return l.getAndIncrement();
-		});
-
-		Stream<String> stringStream = stream.map(lng -> {
-			System.out.println(".map function running for " + lng);
-			return Long.toString(lng, 16);
-		});
-
-		System.out.println(".map() executed");
-
-		stringStream.map(str -> {
-			System.out.println(".map function 2 running for " + str);
-			return str.toUpperCase();
-		})
-				.allMatch(str -> str.isEmpty());
-
+	public MosquitoLogger logger() {
+		return this.getMosquitoLogger();
 	}
+
+	public CacheProxy getCacheProxy() {
+		return cacheProxy;
+	}
+
 }

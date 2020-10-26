@@ -21,7 +21,7 @@ module com.eussence.mosquito.core {
 	exports com.eussence.mosquito.core.api.data;
 	exports com.eussence.mosquito.core.api;
 
-	requires com.eussence.mosquito.api;
+	requires transitive com.eussence.mosquito.api;
 	requires com.fasterxml.jackson.annotation;
 	requires com.fasterxml.jackson.core;
 	requires com.fasterxml.jackson.databind;
@@ -30,5 +30,5 @@ module com.eussence.mosquito.core {
 	requires vertx.core;
 
 	requires static lombok;
-	requires com.eussence.mosquito.command.wrapper;
+	requires transitive com.eussence.mosquito.command.wrapper;
 }

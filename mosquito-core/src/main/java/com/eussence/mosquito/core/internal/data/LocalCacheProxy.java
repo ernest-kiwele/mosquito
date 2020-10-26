@@ -18,6 +18,7 @@ package com.eussence.mosquito.core.internal.data;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
+import com.eussence.mosquito.api.utils.JsonMapper;
 import com.eussence.mosquito.core.api.data.CacheProxy;
 
 import io.vertx.core.Vertx;
@@ -36,19 +37,20 @@ public class LocalCacheProxy implements CacheProxy {
 
 	public static LocalCacheProxy init(Vertx vertx) {
 		LocalCacheProxy cp = new LocalCacheProxy();
-		cp.localCache = vertx.sharedData().getLocalMap(CacheProxy.SHARED_DATA_MAP);
+		cp.localCache = vertx.sharedData()
+				.getLocalMap(CacheProxy.SHARED_DATA_MAP);
 
 		return cp;
 	}
 
 	@Override
 	public void put(String key, Object val) {
-		this.localCache.put(key, this.json(val));
+		this.localCache.put(key, JsonMapper.json(val));
 	}
 
 	@Override
 	public <T> T get(String key, Class<T> valueClass) {
-		return this.fromJson((String) this.localCache.get(key), valueClass);
+		return JsonMapper.fromJson((String) this.localCache.get(key), valueClass);
 	}
 
 	@Override

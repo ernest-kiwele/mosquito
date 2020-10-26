@@ -13,23 +13,29 @@
  * limitations under the License.
  */
 
-package com.eussence.mosquito.core.api.data;
+package com.eussence.mosquito.core.api;
 
-import java.util.concurrent.CompletableFuture;
+import java.time.Instant;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
- * An concrete cache proxy provides access to data meant to be cached and used
- * during execution of call chains.
+ * A log entry queued and dispatched by the log manager in a mosquito context.
  * 
  * @author Ernest Kiwele
  */
-public interface CacheProxy {
-
-	void put(String key, Object val);
-
-	<T> T get(String key, Class<T> valueClass);
-
-	CompletableFuture<Void> putAsync(String key, Object val);
-
-	<T> CompletableFuture<T> getAsync(String key);
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
+public class MosquitoLogEntry {
+	private Instant date;
+	private String source;
+	private String type;
+	private String message;
 }
