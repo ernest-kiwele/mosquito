@@ -20,7 +20,7 @@ import com.eussence.mosquito.api.http.AuthData
 import com.eussence.mosquito.api.http.Body
 import com.eussence.mosquito.api.http.HttpMethod
 import com.eussence.mosquito.api.http.Request
-import com.fasterxml.jackson.annotation.JsonIgnore
+import com.eussence.mosquito.api.http.RequestTemplate
 import com.fasterxml.jackson.annotation.JsonValue
 
 /**
@@ -35,6 +35,9 @@ class RequestWrapper {
 	@JsonValue
 	@Delegate
 	Request request = Request.builder().build()
+
+	@Delegate
+	RequestTemplate template = RequestTemplate.builder().build()
 
 	String name = "_default"
 
