@@ -15,11 +15,13 @@
 
 package com.eussence.mosquito.core.api.execution;
 
+import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 
 import com.eussence.mosquito.api.CallChain;
 import com.eussence.mosquito.api.CallChainResult;
 import com.eussence.mosquito.api.http.Request;
+import com.eussence.mosquito.api.http.RequestTemplate;
 import com.eussence.mosquito.api.http.Response;
 import com.eussence.mosquito.command.wrapper.Ether;
 
@@ -31,11 +33,17 @@ import com.eussence.mosquito.command.wrapper.Ether;
  */
 public interface MosquitoScheduler {
 
-	Response submit(Request request, Ether contextEther);
+	Response submit(Request request, SchedulingConfig scheduleConfig);
 
-	CompletableFuture<Response> submitAsync(Request request, Ether contextEther);
+	CompletableFuture<Response> submitAsync(Request request, SchedulingConfig scheduleConfig);
 
-	CallChainResult submit(CallChain callChain, Ether contextEther);
+	Collection<Response> submit(RequestTemplate requestTemplate, Ether contextEther, SchedulingConfig scheduleConfig);
 
-	CompletableFuture<CallChainResult> submitAsync(CallChain callChain, Ether contextEther);
+	CompletableFuture<Collection<Response>> submitAsync(RequestTemplate requestTemplate, Ether contextEther,
+			SchedulingConfig scheduleConfig);
+
+	CallChainResult submit(CallChain callChain, Ether contextEther, SchedulingConfig scheduleConfig);
+
+	CompletableFuture<CallChainResult> submitAsync(CallChain callChain, Ether contextEther,
+			SchedulingConfig scheduleConfig);
 }

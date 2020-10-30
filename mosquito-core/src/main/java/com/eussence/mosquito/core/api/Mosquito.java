@@ -107,7 +107,6 @@ public class Mosquito {
 	}
 
 	private void initDistributed() {
-
 		CompletableFuture<Vertx> f = new CompletableFuture<>();
 
 		VertxOptions options = new VertxOptions().setClustered(true);
@@ -182,5 +181,4 @@ public class Mosquito {
 	public CacheProxy getCacheProxy() {
 		return cacheProxy;
 	}
-
 }

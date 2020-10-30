@@ -15,6 +15,8 @@
 
 package com.eussence.mosquito.api.exception;
 
+import java.util.function.Supplier;
+
 /**
  * A local unchecked exception for use across the Mosquito APIs.
  * 
@@ -37,5 +39,9 @@ public class MosquitoException extends RuntimeException {
 
 	public MosquitoException(Throwable c) {
 		super(c);
+	}
+
+	public static Supplier<MosquitoException> supplier(String message) {
+		return () -> new MosquitoException(message);
 	}
 }

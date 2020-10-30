@@ -13,29 +13,32 @@
  * limitations under the License.
  */
 
-package com.eussence.mosquito.http.api;
+package com.eussence.mosquito.core.api.execution;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
- * An HTTP driver factory is used to discover and expose HTTP drivers. HTTP
- * drivers are pluggable implementations of {@link HttpDriver HttpDriver} that
- * can be discovered at runtime from third-party or user-provided libraries.
- * 
- * Beside creating the HttpDriver implementation, this interface also provides
- * metadata that can be used by the consumer to filter/select among options.
+ * A type associated with node metadata for machines belonging to a Mosquito
+ * cluster.
  * 
  * @author Ernest Kiwele
  */
-public interface HttpDriverFactory {
+@Builder
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class MosquitoNode {
+	private String hostName;
+	private String ipV4;
+	private String osName;
+	private String osVersion;
+	private int httpPort;
+	private String javaVersion;
+	private String javaVendor;
 
-	String getProvider();
-
-	String getId();
-
-	String getName();
-
-	String getDescription();
-
-	String getFeaturesDescription();
-
-	HttpDriver getDriver();
+	private long systemMemory;
+	private long cpuCores;
 }

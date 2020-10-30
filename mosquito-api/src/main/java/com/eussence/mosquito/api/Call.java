@@ -19,8 +19,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.eussence.mosquito.api.data.TemplatedObject;
-import com.eussence.mosquito.api.http.Request;
+import com.eussence.mosquito.api.http.RequestTemplate;
 import com.eussence.mosquito.api.qa.Assertion;
 
 import lombok.AllArgsConstructor;
@@ -45,7 +44,7 @@ public class Call {
 	private String key;
 	private String description;
 	private String comments;
-	private String dependsOn;
+	private List<String> dependsOn;
 
 	@Builder.Default
 	private Instant dateCreated = Instant.now();
@@ -59,5 +58,6 @@ public class Call {
 	private String responseScript;
 
 	@Builder.Default
-	private TemplatedObject<Request> requestTemplate = TemplatedObject.instance(Request.class);
+	private RequestTemplate requestTemplate = RequestTemplate.builder()
+			.build();
 }

@@ -58,4 +58,6 @@ public class CallChain {
 	private String createdBy;
 	@Builder.Default
 	private Instant dateCreated = Instant.now();
+
+	private String dataSet;
 }

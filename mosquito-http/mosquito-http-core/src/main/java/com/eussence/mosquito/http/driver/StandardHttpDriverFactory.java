@@ -26,6 +26,7 @@ import com.eussence.mosquito.http.api.HttpDriverFactory;
 public class StandardHttpDriverFactory implements HttpDriverFactory {
 
 	public static final String PROVIDER_NAME = "com.eussence";
+	public static final String STANDARD_DRIVER_ID = "com.eussence.std";
 
 	@Override
 	public String getProvider() {
@@ -35,6 +36,11 @@ public class StandardHttpDriverFactory implements HttpDriverFactory {
 	@Override
 	public String getName() {
 		return "Standard HTTP Driver";
+	}
+
+	@Override
+	public String getId() {
+		return STANDARD_DRIVER_ID;
 	}
 
 	@Override

@@ -39,6 +39,8 @@ import lombok.Setter;
 @NoArgsConstructor
 public class RequestTemplate {
 
+	private String key;
+
 	@Builder.Default
 	private CommandLanguage lang = CommandLanguage.GROOVY;
 
@@ -55,6 +57,11 @@ public class RequestTemplate {
 	private String authTypeTemplate;
 	private String authCredentialsTemplate;
 	private String authHeaderName;
+
+	private String dataSet;
+
+	@Builder.Default
+	private Map<String, String> postResponseVariables = new HashMap<>();
 
 	public RequestTemplate headerTemplate(String k, String v) {
 		this.headerTemplates.put(k, v);

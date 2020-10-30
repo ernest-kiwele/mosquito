@@ -13,7 +13,9 @@
  * limitations under the License.
  */
 
-package com.eussence.mosquito.api.qa;
+package com.eussence.mosquito.core.api.execution;
+
+import java.util.function.Predicate;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,17 +23,32 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * An assertion is a check that verifies conditions on completion.
+ * A set of parameters used to configure the scheduling of request execution.
+ * This class defines such attributes as the number of calls the make or the
+ * parallelism to aim for.
  * 
  * @author Ernest Kiwele
  */
 @Builder
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
-public class Assertion {
-	private String id;
-	private String description;
-	private String booleanExpression;
-	private String messageTemplate;
+public class SchedulingConfig {
+
+	public static final Predicate<MosquitoNode> DEFAULT_NODE_SELECTOR = n -> true;
+	public static final SchedulingConfig DEFAULT_CONFIG = SchedulingConfig.builder()
+			.parallel(false)
+			.nodeThreadCount(5)
+			.iterations(1)
+			.nodeSelector(DEFAULT_NODE_SELECTOR)
+			.build();
+
+	private String httpDriverId;
+	private boolean parallel;
+	@Builder.Default
+	private int nodeThreadCount = 5;
+
+	@Builder.Default
+	private int iterations = 1;
+	private Predicate<MosquitoNode> nodeSelector;
 }
