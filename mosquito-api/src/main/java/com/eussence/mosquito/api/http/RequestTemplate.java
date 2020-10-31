@@ -16,6 +16,7 @@
 package com.eussence.mosquito.api.http;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
@@ -68,7 +69,7 @@ public class RequestTemplate {
 	private String authCredentialsTemplate;
 	private String authHeaderName;
 
-	private String dataSet;
+	private List<String> dataSet;
 
 	@Builder.Default
 	private Map<String, String> postResponseVariables = new HashMap<>();
@@ -112,7 +113,7 @@ public class RequestTemplate {
 					.build());
 		}
 
-		requestBuilder.dataSet(this.dataSet);
+		requestBuilder.dataSets(this.dataSet);
 
 		return requestBuilder.build();
 	}

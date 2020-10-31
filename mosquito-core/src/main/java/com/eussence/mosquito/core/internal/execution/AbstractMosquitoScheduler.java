@@ -26,8 +26,9 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 
 import com.eussence.mosquito.api.CallChain;
-import com.eussence.mosquito.api.CallChainResult;
+import com.eussence.mosquito.api.data.Dataset;
 import com.eussence.mosquito.api.exception.MosquitoException;
+import com.eussence.mosquito.api.execution.ExecutionResult;
 import com.eussence.mosquito.api.http.Request;
 import com.eussence.mosquito.api.http.RequestTemplate;
 import com.eussence.mosquito.api.http.Response;
@@ -83,7 +84,7 @@ public abstract class AbstractMosquitoScheduler implements MosquitoScheduler {
 	}
 
 	@Override
-	public CallChainResult submit(CallChain callChain, Ether contextEther, SchedulingConfig scheduleConfig) {
+	public ExecutionResult submit(CallChain callChain, Ether contextEther, SchedulingConfig scheduleConfig) {
 
 		var requests = callChain.getCalls()
 				.entrySet()
@@ -96,7 +97,7 @@ public abstract class AbstractMosquitoScheduler implements MosquitoScheduler {
 	}
 
 	@Override
-	public CompletableFuture<CallChainResult> submitAsync(CallChain callChain, Ether contextEther,
+	public CompletableFuture<ExecutionResult> submitAsync(CallChain callChain, Ether contextEther,
 			SchedulingConfig scheduleConfig) {
 		var requests = callChain.getCalls()
 				.entrySet()
@@ -108,15 +109,20 @@ public abstract class AbstractMosquitoScheduler implements MosquitoScheduler {
 		return this.scheduleAsync(requests, callChain, scheduleConfig);
 	}
 
+	protected List<Map<String, Object>> getDataSet(Dataset dateSet) {
+		// TODO: Implement resolution of data set content:
+		return List.of();
+	}
+
 	protected abstract Collection<Response> schedule(Iterable<Request> requests, SchedulingConfig scheduleConfig);
 
 	protected abstract CompletableFuture<Collection<Response>> scheduleAsync(Iterable<Request> requests,
 			SchedulingConfig scheduleConfig);
 
-	protected abstract CallChainResult schedule(Map<String, List<Request>> requests, CallChain chain,
+	protected abstract ExecutionResult schedule(Map<String, List<Request>> requests, CallChain chain,
 			SchedulingConfig scheduleConfig);
 
-	protected abstract CompletableFuture<CallChainResult> scheduleAsync(Map<String, List<Request>> requests,
+	protected abstract CompletableFuture<ExecutionResult> scheduleAsync(Map<String, List<Request>> requests,
 			CallChain chain, SchedulingConfig scheduleConfig);
 
 	protected abstract List<Request> resolveRequestTemplate(RequestTemplate template, Ether contextEther);

@@ -31,6 +31,8 @@ import io.vertx.core.shareddata.AsyncMap;
  */
 public class ClusteredCacheProxy implements CacheProxy {
 
+	private static final String SHARED_DATA_MAP = "com.eussence.mosquito.map.shared";
+
 	private ClusteredCacheProxy() {
 	}
 
@@ -89,6 +91,21 @@ public class ClusteredCacheProxy implements CacheProxy {
 		this.clusterCache.put(key, val, res -> {
 			if (res.succeeded()) {
 				f.complete(null);
+			} else {
+				f.completeExceptionally(res.cause());
+			}
+		});
+
+		return f;
+	}
+
+	@Override
+	public <T> CompletableFuture<T> getAsync(String key, Class<T> valueClass) {
+		CompletableFuture<T> f = new CompletableFuture<>();
+
+		this.clusterCache.get(key, res -> {
+			if (res.succeeded()) {
+				f.complete(JsonMapper.fromJson((String) res.result(), valueClass));
 			} else {
 				f.completeExceptionally(res.cause());
 			}

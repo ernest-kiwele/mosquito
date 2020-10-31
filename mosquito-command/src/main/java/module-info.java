@@ -20,7 +20,6 @@
 module com.eussence.mosquito.command {
 	exports com.eussence.mosquito.command.internal;
 	exports com.eussence.mosquito.command.api;
-	exports com.eussence.mosquito.command.internal.factory;
 
 	requires com.eussence.mosquito.api;
 	requires com.eussence.mosquito.http;

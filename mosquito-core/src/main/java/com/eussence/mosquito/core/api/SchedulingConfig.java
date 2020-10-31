@@ -15,7 +15,11 @@
 
 package com.eussence.mosquito.core.api;
 
+import java.util.Collection;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
+
+import com.eussence.mosquito.api.execution.ExecutionEvent;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -51,4 +55,8 @@ public class SchedulingConfig {
 	@Builder.Default
 	private int iterations = 1;
 	private Predicate<MosquitoNode> nodeSelector;
+
+	private boolean collectMetrics;
+	private Collection<Consumer<ExecutionEvent>> eventConsumers;
+	private boolean runAssertions;
 }

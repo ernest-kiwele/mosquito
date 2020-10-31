@@ -25,10 +25,14 @@ import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import com.eussence.mosquito.api.MapObject;
+import com.eussence.mosquito.api.command.CommandLanguage;
+import com.eussence.mosquito.api.command.Resolver;
 import com.eussence.mosquito.api.exception.MosquitoException;
 import com.eussence.mosquito.api.utils.JsonMapper;
+import com.eussence.mosquito.command.internal.GroovyResolver;
 import com.eussence.mosquito.command.wrapper.Ether;
 import com.eussence.mosquito.core.api.data.CacheProxy;
 import com.eussence.mosquito.core.api.data.ContextInterface;
@@ -66,6 +70,11 @@ public class Mosquito {
 	private CacheProxy cacheProxy;
 	private ContextInterface contextInterface;
 	private MosquitoScheduler scheduler;
+
+	@Builder.Default
+	private Function<CommandLanguage, Resolver> resolverFactory = lang -> lang == CommandLanguage.GROOVY
+			? GroovyResolver.getInstance()
+			: null;
 
 	public static Mosquito instance() {
 		return Mosquito.builder()

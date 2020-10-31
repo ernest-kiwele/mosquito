@@ -36,11 +36,11 @@ import com.eussence.mosquito.api.command.CommandLanguage;
 import com.eussence.mosquito.api.command.Resolver;
 import com.eussence.mosquito.api.execution.ExecutionEvent;
 import com.eussence.mosquito.api.execution.ExecutionResult;
+import com.eussence.mosquito.api.execution.ExecutionSchedule;
 import com.eussence.mosquito.api.http.Request;
 import com.eussence.mosquito.api.http.Response;
 import com.eussence.mosquito.api.qa.Assertion;
 import com.eussence.mosquito.api.qa.AssertionResult;
-import com.eussence.mosquito.core.api.execution.ExecutionSchedule;
 import com.eussence.mosquito.http.api.HttpDriver;
 
 import lombok.AllArgsConstructor;
@@ -179,13 +179,8 @@ public class StandaloneSchedule {
 				.id(schedule.getId())
 				.assertionsRun(this.runAssertions)
 				.metricsCollected(this.collectMetrics)
-				.environment(schedule.getEnvironment())
 				.datasets(schedule.getDatasets())
-				.vars(schedule.getVars())
-				.callChainResults(schedule.getCallChains()
-						.stream()
-						.map(cc -> this.executeCallChain(cc, schedule.getContext()))
-						.collect(Collectors.toMap(CallChainResult::getKey, Function.identity())))
+				.callChainResults(this.executeCallChain(schedule.getCallChain(), schedule.getContext()))
 				.endDate(Instant.now())
 				.build();
 	}

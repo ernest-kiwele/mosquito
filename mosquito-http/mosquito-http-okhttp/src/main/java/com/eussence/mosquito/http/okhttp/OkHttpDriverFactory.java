@@ -19,6 +19,7 @@ import com.eussence.mosquito.http.api.HttpDriver;
 import com.eussence.mosquito.http.api.HttpDriverFactory;
 
 /**
+ * Factory for OkHttp driver.
  * 
  * @author Ernest Kiwele
  *
@@ -28,6 +29,11 @@ public class OkHttpDriverFactory implements HttpDriverFactory {
 	@Override
 	public String getProvider() {
 		return "com.eussence";
+	}
+
+	@Override
+	public String getId() {
+		return "com.eussence.okhttp";
 	}
 
 	@Override

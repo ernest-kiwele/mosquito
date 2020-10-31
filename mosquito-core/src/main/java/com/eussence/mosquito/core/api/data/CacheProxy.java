@@ -31,5 +31,5 @@ public interface CacheProxy {
 
 	CompletableFuture<Void> putAsync(String key, Object val);
 
-	<T> CompletableFuture<T> getAsync(String key);
+	<T> CompletableFuture<T> getAsync(String key, Class<T> valueClass);
 }

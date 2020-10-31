@@ -17,6 +17,7 @@ package com.eussence.mosquito.api.http;
 
 import java.net.URI;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
@@ -64,7 +65,10 @@ public final class Request {
 
 	private AuthData authData;
 
-	private String dataSet;
+	private List<String> dataSets;
+
+	private String dataSetRecordId;
+	private Map<String, Object> dataSetRecord;
 
 	@Builder.Default
 	private ConnectionConfig connectionConfig = new ConnectionConfig(true, 60000L, 180000L, false);

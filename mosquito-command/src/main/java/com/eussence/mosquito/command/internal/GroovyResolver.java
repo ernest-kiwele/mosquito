@@ -23,8 +23,8 @@ import org.codehaus.groovy.control.CompilationFailedException;
 import org.codehaus.groovy.control.CompilerConfiguration;
 
 import com.eussence.mosquito.api.CallChain;
-import com.eussence.mosquito.api.ExpressionLanguage;
 import com.eussence.mosquito.api.MapObject;
+import com.eussence.mosquito.api.command.CommandLanguage;
 import com.eussence.mosquito.api.command.Resolver;
 import com.eussence.mosquito.api.data.Dataset;
 import com.eussence.mosquito.api.data.Environment;
@@ -55,8 +55,8 @@ public class GroovyResolver implements Resolver {
 	}
 
 	@Override
-	public ExpressionLanguage getExpressionLanguage() {
-		return ExpressionLanguage.GROOVY;
+	public CommandLanguage getExpressionLanguage() {
+		return CommandLanguage.GROOVY;
 	}
 
 	@Override

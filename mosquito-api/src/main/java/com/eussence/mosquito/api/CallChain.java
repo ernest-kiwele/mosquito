@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.eussence.mosquito.api.command.CommandLanguage;
+import com.eussence.mosquito.api.data.Dataset;
 import com.eussence.mosquito.api.qa.Assertion;
 
 import lombok.AllArgsConstructor;
@@ -60,5 +61,5 @@ public class CallChain {
 	@Builder.Default
 	private Instant dateCreated = Instant.now();
 
-	private String dataSet;
+	private Dataset dataSet;
 }

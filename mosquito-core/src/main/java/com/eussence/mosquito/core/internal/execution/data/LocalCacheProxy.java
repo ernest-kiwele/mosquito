@@ -30,6 +30,8 @@ import io.vertx.core.Vertx;
  */
 public class LocalCacheProxy implements CacheProxy {
 
+	private static final String SHARED_DATA_MAP = "com.eussence.mosquito.map.shared";
+
 	private Map<String, Object> localCache;
 
 	private LocalCacheProxy() {
@@ -38,7 +40,7 @@ public class LocalCacheProxy implements CacheProxy {
 	public static LocalCacheProxy init(Vertx vertx) {
 		LocalCacheProxy cp = new LocalCacheProxy();
 		cp.localCache = vertx.sharedData()
-				.getLocalMap(CacheProxy.SHARED_DATA_MAP);
+				.getLocalMap(SHARED_DATA_MAP);
 
 		return cp;
 	}
@@ -57,5 +59,10 @@ public class LocalCacheProxy implements CacheProxy {
 	public CompletableFuture<Void> putAsync(String key, Object val) {
 		this.put(key, val);
 		return CompletableFuture.completedFuture(null);
+	}
+
+	@Override
+	public <T> CompletableFuture<T> getAsync(String key, Class<T> valueClass) {
+		return CompletableFuture.supplyAsync(() -> JsonMapper.fromJson((String) this.localCache.get(key), valueClass));
 	}
 }

@@ -23,7 +23,6 @@ import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
@@ -35,21 +34,17 @@ import org.apache.commons.io.IOUtils;
 
 import com.eussence.mosquito.api.Call;
 import com.eussence.mosquito.api.CallChain;
-import com.eussence.mosquito.api.CallChainResult;
-import com.eussence.mosquito.api.ExpressionLanguage;
 import com.eussence.mosquito.api.MapObject;
-import com.eussence.mosquito.api.data.Dataset;
 import com.eussence.mosquito.api.data.Environment;
-import com.eussence.mosquito.api.data.Vars;
 import com.eussence.mosquito.api.exception.MosquitoException;
 import com.eussence.mosquito.api.execution.ExecutionResult;
+import com.eussence.mosquito.api.execution.ExecutionSchedule;
 import com.eussence.mosquito.api.http.Body;
 import com.eussence.mosquito.api.http.HttpMethod;
 import com.eussence.mosquito.api.http.Request;
 import com.eussence.mosquito.api.http.Response;
 import com.eussence.mosquito.api.qa.Assertion;
 import com.eussence.mosquito.api.utils.Templates;
-import com.eussence.mosquito.core.api.execution.ExecutionSchedule;
 import com.eussence.mosquito.http.driver.HttpDriverFactoryLocator;
 import com.eussence.mosquito.reports.template.BasicReportTemplate;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -93,14 +88,6 @@ public class MosquitoScriptContext extends Script {
 		} catch (Exception e) {
 			throw new MosquitoException("Failed to parse JSON: " + e.getMessage());
 		}
-	}
-
-	protected Call call(String key, String uri) {
-		Call c = new Call().key(key);
-		c.getRequestTemplate()
-				.set("uri", uri);
-
-		return c;
 	}
 
 	protected Call call(Map<String, Object> params) {
@@ -147,22 +134,8 @@ public class MosquitoScriptContext extends Script {
 				.build());
 	}
 
-	protected CallChain chain(String key, String name, String description, String comments, Map<String, Call> calls,
-			List<Assertion> assertions, ExpressionLanguage expressionLanguage, boolean scriptMode, String script,
-			String createdBy, Date dateCreated) {
-		return new CallChain(key, name, description, comments, calls, assertions, expressionLanguage, scriptMode,
-				script, createdBy, dateCreated);
-	}
-
 	protected Assertion assertion(String id, String description, String booleanExpression, String messageTemplate) {
 		return new Assertion(id, description, booleanExpression, messageTemplate);
-	}
-
-	protected ExecutionSchedule schedule(String id, boolean assertionsRun, boolean metricsCollected,
-			Map<String, CallChain> callChains, Environment environment, Map<String, Dataset> datasets,
-			Map<String, Vars> vars, Map<String, CallChainResult> callChainResults) {
-
-		return new ExecutionSchedule(id, callChains.values(), environment, datasets, vars);
 	}
 
 	protected Environment environment(String key, String name, boolean production, Map<String, Object> vars) {

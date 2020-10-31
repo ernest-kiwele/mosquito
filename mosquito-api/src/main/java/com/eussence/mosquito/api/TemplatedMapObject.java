@@ -19,6 +19,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+import com.eussence.mosquito.api.command.CommandLanguage;
+
 /**
  * A map object that supports dynamically resolved values using templates of a
  * given language.
@@ -27,7 +29,7 @@ import java.util.Objects;
  */
 public class TemplatedMapObject extends MapObject {
 
-	private ExpressionLanguage _lang = ExpressionLanguage.GROOVY;
+	private CommandLanguage _lang = CommandLanguage.GROOVY;
 	private Map<String, String> _meta = new HashMap<>();
 
 	public Map<String, String> __meta() {
@@ -38,14 +40,15 @@ public class TemplatedMapObject extends MapObject {
 		return this._meta;
 	}
 
-	public ExpressionLanguage __lang() {
-		return this._lang == null ? ExpressionLanguage.GROOVY : this._lang;
+	public CommandLanguage __lang() {
+		return this._lang == null ? CommandLanguage.GROOVY : this._lang;
 	}
 
 	public TemplatedMapObject template(String key, String template) {
 
-		this.__meta().put(Objects.requireNonNull(key, "The key is required"),
-				Objects.requireNonNull(template, "A vlaid template is required"));
+		this.__meta()
+				.put(Objects.requireNonNull(key, "The key is required"),
+						Objects.requireNonNull(template, "A vlaid template is required"));
 
 		return this;
 	}

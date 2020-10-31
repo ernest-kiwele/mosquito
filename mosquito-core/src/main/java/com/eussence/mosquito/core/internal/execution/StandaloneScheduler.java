@@ -25,12 +25,15 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import com.eussence.mosquito.api.CallChain;
-import com.eussence.mosquito.api.CallChainResult;
+import com.eussence.mosquito.api.execution.ExecutionResult;
+import com.eussence.mosquito.api.execution.ExecutionSchedule;
 import com.eussence.mosquito.api.http.Request;
 import com.eussence.mosquito.api.http.RequestTemplate;
 import com.eussence.mosquito.api.http.Response;
 import com.eussence.mosquito.command.wrapper.Ether;
+import com.eussence.mosquito.core.api.Mosquito;
 import com.eussence.mosquito.core.api.SchedulingConfig;
+import com.eussence.mosquito.core.api.execution.standalone.StandaloneSchedule;
 import com.eussence.mosquito.http.api.HttpDriver;
 
 /**
@@ -82,15 +85,27 @@ public class StandaloneScheduler extends AbstractMosquitoScheduler {
 	}
 
 	@Override
-	protected CallChainResult schedule(Map<String, List<Request>> requests, CallChain chain,
+	protected ExecutionResult schedule(Map<String, List<Request>> requests, CallChain chain,
 			SchedulingConfig scheduleConfig) {
-		return null;
+		return StandaloneSchedule.builder()
+				.client(this.getDriver(scheduleConfig.getHttpDriverId()))
+				.collectMetrics(scheduleConfig.isCollectMetrics())
+				.eventConsumers(scheduleConfig.getEventConsumers())
+				.executionId(chain.getKey())
+				.resolverFactory(Mosquito.instance()
+						.getResolverFactory())
+				.runAssertions(scheduleConfig.isRunAssertions())
+				.build()
+				.execute(ExecutionSchedule.builder()
+						.callChain(chain)
+						.datasets(this.getDataSet(chain.getDataSet()))
+						.build());
 	}
 
 	@Override
-	protected CompletableFuture<CallChainResult> scheduleAsync(Map<String, List<Request>> requests, CallChain chain,
+	protected CompletableFuture<ExecutionResult> scheduleAsync(Map<String, List<Request>> requests, CallChain chain,
 			SchedulingConfig scheduleConfig) {
-		return null;
+		return CompletableFuture.supplyAsync(() -> this.schedule(requests, chain, scheduleConfig));
 	}
 
 	@Override

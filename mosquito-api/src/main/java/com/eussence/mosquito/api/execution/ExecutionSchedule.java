@@ -13,32 +13,45 @@
  * limitations under the License.
  */
 
-package com.eussence.mosquito.api.command;
+package com.eussence.mosquito.api.execution;
 
+import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import com.eussence.mosquito.api.CallChain;
 import com.eussence.mosquito.api.MapObject;
-import com.eussence.mosquito.api.data.Dataset;
-import com.eussence.mosquito.api.data.Environment;
-import com.eussence.mosquito.api.data.Vars;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
- * A resolver is a language-specific expression evaluator that processes
- * templates and runs scripts.
+ * A once-off object used to send information to local or remote objects
+ * expected to run call chains.
  * 
  * @author Ernest Kiwele
  */
-public interface Resolver {
+@Builder
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+public class ExecutionSchedule {
 
-	CommandLanguage getExpressionLanguage();
+	@Builder.Default
+	private String id = UUID.randomUUID()
+			.toString();
 
-	Object eval(MapObject context, String template);
+	private String description;
+	private String comments;
 
-	Map<String, Object> eval(MapObject context, Map<String, String> templates);
+	@Builder.Default
+	private MapObject details = MapObject.instance();
 
-	Map<String, Object> exec(MapObject context, String script);
-
-	Object eval(String template, Environment environment, Map<String, Dataset> datasets, Map<String, Vars> vars,
-			Map<String, CallChain> callChains, MapObject outerContext);
+	private CallChain callChain;
+	private List<Map<String, Object>> datasets;
+	private MapObject context;
 }

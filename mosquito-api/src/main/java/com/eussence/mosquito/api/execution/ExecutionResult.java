@@ -16,17 +16,13 @@
 package com.eussence.mosquito.api.execution;
 
 import java.time.Instant;
-import java.util.AbstractMap;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import com.eussence.mosquito.api.CallChainResult;
 import com.eussence.mosquito.api.MapObject;
 import com.eussence.mosquito.api.Result;
-import com.eussence.mosquito.api.data.Dataset;
 import com.eussence.mosquito.api.data.Environment;
 import com.eussence.mosquito.api.data.Vars;
 import com.eussence.mosquito.api.qa.AssertionResult;
@@ -52,7 +48,7 @@ public class ExecutionResult implements Result {
 	private boolean metricsCollected;
 
 	private Environment environment;
-	private Map<String, Dataset> datasets;
+	private List<Map<String, Object>> datasets;
 	private Map<String, Vars> vars;
 
 	private Instant startDate;
@@ -60,7 +56,7 @@ public class ExecutionResult implements Result {
 
 	private MapObject details;
 
-	private Map<String, CallChainResult> callChainResults;
+	private CallChainResult callChainResults;
 	@Builder.Default
 	private List<AssertionResult> assertionResults = new ArrayList<>();
 
@@ -68,17 +64,11 @@ public class ExecutionResult implements Result {
 	public boolean isSuccessful() {
 		return (assertionResults == null || assertionResults.isEmpty() || assertionResults.stream()
 				.allMatch(AssertionResult::isSucceeded))
-				&& (this.callChainResults == null || this.callChainResults.isEmpty() || this.callChainResults.values()
-						.stream()
-						.allMatch(Result::isSuccessful));
+				&& (this.callChainResults == null || this.callChainResults.isSuccessful());
 	}
 
 	@Override
 	public Map<String, Result> getChildResults() {
-		return this.callChainResults == null ? new HashMap<>()
-				: this.callChainResults.entrySet()
-						.stream()
-						.map(entry -> new AbstractMap.SimpleEntry<String, Result>(entry.getKey(), entry.getValue()))
-						.collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue));
+		return Map.of();
 	}
 }

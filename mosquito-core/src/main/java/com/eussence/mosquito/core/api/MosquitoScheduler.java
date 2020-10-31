@@ -19,7 +19,7 @@ import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 
 import com.eussence.mosquito.api.CallChain;
-import com.eussence.mosquito.api.CallChainResult;
+import com.eussence.mosquito.api.execution.ExecutionResult;
 import com.eussence.mosquito.api.http.Request;
 import com.eussence.mosquito.api.http.RequestTemplate;
 import com.eussence.mosquito.api.http.Response;
@@ -42,8 +42,8 @@ public interface MosquitoScheduler {
 	CompletableFuture<Collection<Response>> submitAsync(RequestTemplate requestTemplate, Ether contextEther,
 			SchedulingConfig scheduleConfig);
 
-	CallChainResult submit(CallChain callChain, Ether contextEther, SchedulingConfig scheduleConfig);
+	ExecutionResult submit(CallChain callChain, Ether contextEther, SchedulingConfig scheduleConfig);
 
-	CompletableFuture<CallChainResult> submitAsync(CallChain callChain, Ether contextEther,
+	CompletableFuture<ExecutionResult> submitAsync(CallChain callChain, Ether contextEther,
 			SchedulingConfig scheduleConfig);
 }
