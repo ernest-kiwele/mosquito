@@ -64,6 +64,8 @@ public final class Request {
 
 	private AuthData authData;
 
+	private String dataSet;
+
 	@Builder.Default
 	private ConnectionConfig connectionConfig = new ConnectionConfig(true, 60000L, 180000L, false);
 

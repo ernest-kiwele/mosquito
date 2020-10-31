@@ -21,6 +21,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.eussence.mosquito.api.command.CommandLanguage;
 import com.eussence.mosquito.api.qa.Assertion;
 
 import lombok.AllArgsConstructor;
@@ -51,7 +52,7 @@ public class CallChain {
 	@Builder.Default
 	private List<Assertion> assertions = new ArrayList<>();
 	@Builder.Default
-	private ExpressionLanguage expressionLanguage = ExpressionLanguage.GROOVY;
+	private CommandLanguage expressionLanguage = CommandLanguage.GROOVY;
 	private boolean scriptMode;
 	private String script;
 

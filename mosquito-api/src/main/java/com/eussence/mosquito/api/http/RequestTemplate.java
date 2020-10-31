@@ -17,8 +17,16 @@ package com.eussence.mosquito.api.http;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
+
+import com.eussence.mosquito.api.AuthType;
+import com.eussence.mosquito.api.MapObject;
 import com.eussence.mosquito.api.command.CommandLanguage;
+import com.eussence.mosquito.api.command.Resolver;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -52,9 +60,11 @@ public class RequestTemplate {
 	@Builder.Default
 	private Map<String, String> parameterTemplates = new HashMap<>();
 
+	private HttpMethod method;
 	private String entityTemplate;
+	private String mediaType;
 
-	private String authTypeTemplate;
+	private AuthType authType;
 	private String authCredentialsTemplate;
 	private String authHeaderName;
 
@@ -71,5 +81,39 @@ public class RequestTemplate {
 	public RequestTemplate parameterTemplate(String k, String v) {
 		this.parameterTemplates.put(k, v);
 		return this;
+	}
+
+	public Request toRequest(Function<CommandLanguage, Resolver> resolverFactory, MapObject context) {
+		Resolver r = Objects.requireNonNull(resolverFactory.apply(this.lang),
+				"Resolver factory returned null for language: " + this.lang);
+		var requestBuilder = Request.builder();
+		requestBuilder.uri((String) r.eval(context, this.uriTemplate));
+		requestBuilder.headers(this.headerTemplates.entrySet()
+				.stream()
+				.map(e -> Map.entry(e.getKey(), (String) r.eval(context, e.getValue())))
+				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
+		requestBuilder.parameters(this.parameterTemplates.entrySet()
+				.stream()
+				.map(e -> Map.entry(e.getKey(), (String) r.eval(context, e.getValue())))
+				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
+		requestBuilder.method(method);
+		if (method.isBodied()) {
+			requestBuilder.body(Body.builder()
+					.entity(r.eval(context, this.entityTemplate))
+					.mediaType(this.mediaType)
+					.build());
+		}
+
+		requestBuilder.authType(this.authType);
+		if (StringUtils.isNotBlank(this.authCredentialsTemplate)) {
+			requestBuilder.authData(AuthData.builder()
+					.credentials(((String) r.eval(context, this.authCredentialsTemplate)).toCharArray())
+					.headerName(this.authHeaderName)
+					.build());
+		}
+
+		requestBuilder.dataSet(this.dataSet);
+
+		return requestBuilder.build();
 	}
 }

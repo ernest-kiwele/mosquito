@@ -31,8 +31,8 @@ import com.eussence.mosquito.api.Call;
 import com.eussence.mosquito.api.CallChain;
 import com.eussence.mosquito.api.CallChainResult;
 import com.eussence.mosquito.api.CallResult;
-import com.eussence.mosquito.api.ExpressionLanguage;
 import com.eussence.mosquito.api.MapObject;
+import com.eussence.mosquito.api.command.CommandLanguage;
 import com.eussence.mosquito.api.command.Resolver;
 import com.eussence.mosquito.api.execution.ExecutionEvent;
 import com.eussence.mosquito.api.execution.ExecutionResult;
@@ -40,7 +40,6 @@ import com.eussence.mosquito.api.http.Request;
 import com.eussence.mosquito.api.http.Response;
 import com.eussence.mosquito.api.qa.Assertion;
 import com.eussence.mosquito.api.qa.AssertionResult;
-import com.eussence.mosquito.api.utils.Templates;
 import com.eussence.mosquito.core.api.execution.ExecutionSchedule;
 import com.eussence.mosquito.http.api.HttpDriver;
 
@@ -65,25 +64,22 @@ public class StandaloneSchedule {
 	protected boolean collectMetrics;
 	@Builder.Default
 	protected Collection<Consumer<ExecutionEvent>> eventConsumers = new ArrayList<>();
-	protected Function<ExpressionLanguage, Resolver> resolverFactory;
+	protected Function<CommandLanguage, Resolver> resolverFactory;
 	protected HttpDriver client;
 
 	public void registerEventConsumer(Consumer<ExecutionEvent> listener) {
 		this.eventConsumers.add(listener);
 	}
 
-	protected Resolver resolver(ExpressionLanguage lang) {
-		ExpressionLanguage l = null == lang ? ExpressionLanguage.GROOVY : lang;
-
+	protected Resolver resolver(CommandLanguage lang) {
+		CommandLanguage l = null == lang ? CommandLanguage.GROOVY : lang;
 		return this.resolverFactory.apply(l);
 	}
 
-	protected Request getRequestForCall(Call call, ExpressionLanguage lang, MapObject context) {
+	protected Request getRequestForCall(Call call, CommandLanguage lang, MapObject context) {
 
-		return Templates.safeConvert(this.resolver(lang)
-				.eval(context, call.getRequestTemplate()
-						.getTemplates()),
-				Request.class);
+		return call.getRequestTemplate()
+				.toRequest(resolverFactory, context);
 	}
 
 	protected AssertionResult runAssertion(Call call, Assertion assertion, Request request, Response response,
@@ -101,7 +97,8 @@ public class StandaloneSchedule {
 			MapObject c = MapObject.instance()
 					.add("request", request)
 					.add("response", response);
-			boolean succeeded = Boolean.valueOf(String.valueOf(resolver.eval(c, assertion.getBooleanExpression())));
+			boolean succeeded = Boolean
+					.parseBoolean(String.valueOf(resolver.eval(c, assertion.getBooleanExpression())));
 			resultBuilder = resultBuilder.succeeded(succeeded)
 					.error(false);
 

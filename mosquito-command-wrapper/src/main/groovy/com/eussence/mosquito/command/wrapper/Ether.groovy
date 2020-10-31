@@ -77,7 +77,7 @@ public class Ether {
 		}
 	}
 
-	public Ether putAllFields() {
+	public MapObject putAllFields() {
 		if(allMapped) {
 			return this
 		}

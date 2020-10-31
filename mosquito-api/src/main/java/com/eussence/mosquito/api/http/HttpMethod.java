@@ -22,21 +22,31 @@ package com.eussence.mosquito.api.http;
  */
 public enum HttpMethod {
 
-	GET,
+	GET(false),
 
-	POST,
+	POST(true),
 
-	PUT,
+	PUT(true),
 
-	DELETE,
+	DELETE(false),
 
-	OPTIONS,
+	OPTIONS(false),
 
-	HEAD,
+	HEAD(false),
 
-	PATCH,
+	PATCH(true),
 
-	TRACE,
+	TRACE(false),
 
-	CONNECT;
+	CONNECT(false);
+
+	private final boolean bodied;
+
+	HttpMethod(boolean bodied) {
+		this.bodied = bodied;
+	}
+
+	public boolean isBodied() {
+		return bodied;
+	}
 }
