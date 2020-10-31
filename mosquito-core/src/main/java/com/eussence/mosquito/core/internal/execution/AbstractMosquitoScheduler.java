@@ -21,17 +21,21 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
 import com.eussence.mosquito.api.CallChain;
+import com.eussence.mosquito.api.command.CommandLanguage;
+import com.eussence.mosquito.api.command.Resolver;
 import com.eussence.mosquito.api.data.Dataset;
 import com.eussence.mosquito.api.exception.MosquitoException;
 import com.eussence.mosquito.api.execution.ExecutionResult;
 import com.eussence.mosquito.api.http.Request;
 import com.eussence.mosquito.api.http.RequestTemplate;
 import com.eussence.mosquito.api.http.Response;
+import com.eussence.mosquito.command.internal.GroovyResolver;
 import com.eussence.mosquito.command.wrapper.Ether;
 import com.eussence.mosquito.core.api.MosquitoScheduler;
 import com.eussence.mosquito.core.api.SchedulingConfig;
@@ -47,6 +51,10 @@ import com.eussence.mosquito.http.driver.StandardHttpDriverFactory;
 public abstract class AbstractMosquitoScheduler implements MosquitoScheduler {
 
 	private Map<String, HttpDriver> drivers = new ConcurrentHashMap<>();
+
+	protected Function<CommandLanguage, Resolver> resolverFactory = lang -> lang == CommandLanguage.GROOVY
+			? GroovyResolver.getInstance()
+			: null;
 
 	protected HttpDriver getDriver(String id) {
 		return this.drivers.computeIfAbsent(id, n -> HttpDriverFactoryLocator.getInstance()

@@ -24,6 +24,8 @@ import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.eussence.mosquito.api.CallChain;
 import com.eussence.mosquito.api.execution.ExecutionResult;
 import com.eussence.mosquito.api.execution.ExecutionSchedule;
@@ -110,6 +112,19 @@ public class StandaloneScheduler extends AbstractMosquitoScheduler {
 
 	@Override
 	protected List<Request> resolveRequestTemplate(RequestTemplate template, Ether contextEther) {
-		return null;
+
+		Request request = template.toRequest(resolverFactory, contextEther.putAllFields());
+
+		if (StringUtils.isNotBlank(template.getDataSet())) {
+			return this.getDataSet(contextEther.getDataSets()
+					.get(template.getDataSet()))
+					.stream()
+					.map(d -> request.toBuilder()
+							.dataSetRecord(d)
+							.build())
+					.collect(Collectors.toList());
+		}
+
+		return List.of(request);
 	}
 }

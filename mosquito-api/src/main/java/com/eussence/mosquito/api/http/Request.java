@@ -17,7 +17,6 @@ package com.eussence.mosquito.api.http;
 
 import java.net.URI;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
@@ -40,7 +39,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-@Builder
+@Builder(toBuilder = true)
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -65,7 +64,7 @@ public final class Request {
 
 	private AuthData authData;
 
-	private List<String> dataSets;
+	private String dataSet;
 
 	private String dataSetRecordId;
 	private Map<String, Object> dataSetRecord;
