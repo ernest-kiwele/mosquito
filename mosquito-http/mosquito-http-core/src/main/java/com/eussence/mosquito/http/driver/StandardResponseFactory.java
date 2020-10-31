@@ -47,22 +47,7 @@ public class StandardResponseFactory {
 				.failed(false)
 				.uri(response.uri()
 						.toASCIIString())
-//				.body(body)
-
-				// TODO
 				.build();
-
-//		this.status = status;
-//		this.statusReason = statusReason;
-//		this.length = contentLength;
-//		this.body = rawPayload;
-//		this.uri = uri;
-//		this.headers = Collections.unmodifiableMap(headers);
-//		this.cookies = Collections.unmodifiableMap(cookies);
-//
-//		this.failed = false;
-//		this.exception = null;
-//		this.duration = duration;
 	}
 
 	private Body readBody(HttpResponse<?> resp) {
@@ -83,7 +68,7 @@ public class StandardResponseFactory {
 		}
 
 		builder.charSet(this.extractCharSet(contentType));
-		Object entity = resp.body();
+		builder.entity(resp.body());
 
 		return builder.build();
 	}

@@ -31,7 +31,7 @@ module com.eussence.mosquito.http {
 	requires org.apache.commons.lang3;
 	requires org.codehaus.groovy;
 	requires vertx.core;
-	requires java.net.http;
+	requires transitive java.net.http;
 
 	uses com.eussence.mosquito.http.api.HttpDriverFactory;
 
