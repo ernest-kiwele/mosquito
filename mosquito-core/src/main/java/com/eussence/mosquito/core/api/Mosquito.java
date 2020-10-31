@@ -32,10 +32,9 @@ import com.eussence.mosquito.api.utils.JsonMapper;
 import com.eussence.mosquito.command.wrapper.Ether;
 import com.eussence.mosquito.core.api.data.CacheProxy;
 import com.eussence.mosquito.core.api.data.ContextInterface;
-import com.eussence.mosquito.core.api.execution.MosquitoScheduler;
-import com.eussence.mosquito.core.internal.data.ClusteredCacheProxy;
-import com.eussence.mosquito.core.internal.data.ConfigManager;
-import com.eussence.mosquito.core.internal.data.LocalCacheProxy;
+import com.eussence.mosquito.core.internal.execution.data.ClusteredCacheProxy;
+import com.eussence.mosquito.core.internal.execution.data.ConfigManager;
+import com.eussence.mosquito.core.internal.execution.data.LocalCacheProxy;
 
 import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;

@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-package com.eussence.mosquito.core.internal;
+package com.eussence.mosquito.core.internal.execution;
 
 import java.util.Collection;
 import java.util.List;
@@ -32,8 +32,8 @@ import com.eussence.mosquito.api.http.Request;
 import com.eussence.mosquito.api.http.RequestTemplate;
 import com.eussence.mosquito.api.http.Response;
 import com.eussence.mosquito.command.wrapper.Ether;
-import com.eussence.mosquito.core.api.execution.MosquitoScheduler;
-import com.eussence.mosquito.core.api.execution.SchedulingConfig;
+import com.eussence.mosquito.core.api.MosquitoScheduler;
+import com.eussence.mosquito.core.api.SchedulingConfig;
 import com.eussence.mosquito.http.api.HttpDriver;
 import com.eussence.mosquito.http.driver.HttpDriverFactoryLocator;
 import com.eussence.mosquito.http.driver.StandardHttpDriverFactory;

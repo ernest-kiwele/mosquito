@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-package com.eussence.mosquito.api.execution;
+package com.eussence.mosquito.core.api.execution;
 
 import java.util.Collection;
 import java.util.Map;

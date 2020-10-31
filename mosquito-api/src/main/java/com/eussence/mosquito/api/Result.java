@@ -15,8 +15,8 @@
 
 package com.eussence.mosquito.api;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
 
@@ -35,23 +35,15 @@ public interface Result {
 
 	Map<String, Result> getChildResults();
 
-	Date getStartDate();
+	Instant getStartDate();
 
-	Date getEndDate();
-
-	default String formatDate(Date d) {
-		if (null == d) {
-			return "";
-		}
-
-		return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S").format(d);
-	}
+	Instant getEndDate();
 
 	default long getDuration() {
 		if (null == this.getStartDate() || null == this.getEndDate()) {
 			return -1;
 		}
 
-		return this.getEndDate().getTime() - this.getStartDate().getTime();
+		return ChronoUnit.MILLIS.between(this.getStartDate(), this.getEndDate());
 	}
 }

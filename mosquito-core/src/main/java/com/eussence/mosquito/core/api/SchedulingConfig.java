@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-package com.eussence.mosquito.core.api.execution;
+package com.eussence.mosquito.core.api;
 
 import java.util.function.Predicate;
 

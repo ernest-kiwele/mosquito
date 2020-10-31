@@ -13,16 +13,15 @@
  * limitations under the License.
  */
 
-package com.eussence.mosquito.api.execution;
+package com.eussence.mosquito.core.api.execution.standalone;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -35,37 +34,39 @@ import com.eussence.mosquito.api.CallResult;
 import com.eussence.mosquito.api.ExpressionLanguage;
 import com.eussence.mosquito.api.MapObject;
 import com.eussence.mosquito.api.command.Resolver;
-import com.eussence.mosquito.api.http.ClientBinding;
+import com.eussence.mosquito.api.execution.ExecutionEvent;
+import com.eussence.mosquito.api.execution.ExecutionResult;
 import com.eussence.mosquito.api.http.Request;
 import com.eussence.mosquito.api.http.Response;
 import com.eussence.mosquito.api.qa.Assertion;
 import com.eussence.mosquito.api.qa.AssertionResult;
 import com.eussence.mosquito.api.utils.Templates;
+import com.eussence.mosquito.core.api.execution.ExecutionSchedule;
+import com.eussence.mosquito.http.api.HttpDriver;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * A scheduler plans and orchestrates the execution of call chains.
  * 
  * @author Ernest Kiwele
  */
-public abstract class ExecutionScheduler {
+@Builder
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class StandaloneSchedule {
 
 	protected boolean runAssertions;
 	protected String executionId;
 	protected boolean collectMetrics;
+	@Builder.Default
 	protected Collection<Consumer<ExecutionEvent>> eventConsumers = new ArrayList<>();
 	protected Function<ExpressionLanguage, Resolver> resolverFactory;
-	protected Supplier<ClientBinding<?, ?, ?>> clientFactory;
-
-	protected ExecutionScheduler(boolean runAssertions, String executionId, boolean collectMetrics,
-			Collection<Consumer<ExecutionEvent>> eventConsumers,
-			Function<ExpressionLanguage, Resolver> resolverProvider, Supplier<ClientBinding<?, ?, ?>> clientFactory) {
-		this.runAssertions = runAssertions;
-		this.executionId = executionId;
-		this.collectMetrics = collectMetrics;
-		this.eventConsumers = eventConsumers;
-		this.resolverFactory = resolverProvider;
-		this.clientFactory = clientFactory;
-	}
+	protected HttpDriver client;
 
 	public void registerEventConsumer(Consumer<ExecutionEvent> listener) {
 		this.eventConsumers.add(listener);
@@ -79,96 +80,116 @@ public abstract class ExecutionScheduler {
 
 	protected Request getRequestForCall(Call call, ExpressionLanguage lang, MapObject context) {
 
-		return Templates.safeConvert(this.resolver(lang).eval(context, call.getRequestTemplate().getTemplates()),
+		return Templates.safeConvert(this.resolver(lang)
+				.eval(context, call.getRequestTemplate()
+						.getTemplates()),
 				Request.class);
 	}
 
 	protected AssertionResult runAssertion(Call call, Assertion assertion, Request request, Response response,
 			MapObject context, Resolver resolver) {
 
-		AssertionResult result = new AssertionResult();
-
-		result.setId(assertion.getId());
-		result.setAssertion(assertion);
+		var resultBuilder = AssertionResult.builder()
+				.id(assertion.getId())
+				.assertion(assertion);
 
 		if (response.isFailed()) {
-			return result;
+			return resultBuilder.build();
 		}
 
 		try {
-			MapObject c = MapObject.instance().add("request", request).add("response", response);
-			result.setSucceeded(Boolean.valueOf(String.valueOf(resolver.eval(c, assertion.getBooleanExpression()))));
-			result.setError(false);
+			MapObject c = MapObject.instance()
+					.add("request", request)
+					.add("response", response);
+			boolean succeeded = Boolean.valueOf(String.valueOf(resolver.eval(c, assertion.getBooleanExpression())));
+			resultBuilder = resultBuilder.succeeded(succeeded)
+					.error(false);
 
-			if (!result.isSucceeded() && StringUtils.isNotBlank(assertion.getMessageTemplate())) {
-				result.setExpectationMessage(String.valueOf(resolver.eval(c, assertion.getMessageTemplate())));
+			if (!succeeded && StringUtils.isNotBlank(assertion.getMessageTemplate())) {
+				resultBuilder = resultBuilder
+						.expectationMessage(String.valueOf(resolver.eval(c, assertion.getMessageTemplate())));
 			}
 		} catch (Exception ex) {
-			result.setExpectationMessage("[Execution error: " + ex.getMessage() + "]");
-			result.setSucceeded(false);
-			result.setError(true);
-			result.setErrorMessage(ex.getMessage());
-			result.setStackTrace(ExceptionUtils.getStackTrace(ex));
+			resultBuilder = resultBuilder.expectationMessage("[Execution error: " + ex.getMessage() + "]")
+					.succeeded(false)
+					.error(true)
+					.errorMessage(ex.getMessage())
+					.stackTrace(ExceptionUtils.getStackTrace(ex));
 		}
 
-		return result;
+		return resultBuilder.build();
 	}
 
 	protected Map<String, AssertionResult> runAssertions(Call call, Request request, Response response,
 			MapObject context, Resolver resolver) {
 
-		return call.getAssertions().stream()
+		return call.getAssertions()
+				.stream()
 				.map(ass -> this.runAssertion(call, ass, request, response, context, resolver))
 				.collect(Collectors.toMap(AssertionResult::getId, Function.identity(), (ar1, ar2) -> ar1));
 	}
 
 	protected CallResult executeCall(Call call, CallChain callChain, MapObject context, Resolver resolver) {
-		CallResult result = new CallResult();
 
 		Request request = this.getRequestForCall(call, callChain.getExpressionLanguage(), context);
 
-		Date start = new Date();
-		Response response = this.client().send(request);
-		Date end = new Date();
+		var start = Instant.now();
+		Response response = this.client.http(request);
+		var end = Instant.now();
 
 		context.add(call.getKey(), response);
 
-		result.setStartDate(start);
-		result.setEndDate(end);
-		result.setKey(call.getKey());
-		result.setExecuted(true);
-		result.setRequest(request);
-		result.setResponse(response);
+		var resultBuilder = CallResult.builder()
+				.startDate(start)
+				.endDate(end)
+				.key(call.getKey())
+				.executed(true)
+				.request(request)
+				.response(response)
+				.assertionsExecuted(runAssertions);
 
-		result.setAssertionsExecuted(runAssertions);
-		if (!response.isFailed()) {
-
-			if (this.runAssertions) {
-				result.setAssertions(call.getAssertions());
-				result.setAssertionResults(this.runAssertions(call, request, response, context, resolver).values()
-						.stream().collect(Collectors.toList()));
-			}
+		if (!response.isFailed() && this.runAssertions) {
+			resultBuilder = resultBuilder.assertions(call.getAssertions())
+					.assertionResults(this.runAssertions(call, request, response, context, resolver)
+							.values()
+							.stream()
+							.collect(Collectors.toList()));
 		}
 
-		return result;
+		return resultBuilder.build();
 	}
 
 	protected CallChainResult executeCallChain(CallChain callChain, MapObject context) {
-		CallChainResult result = new CallChainResult();
-		result.setKey(callChain.getKey());
-		result.setStartDate(new Date());
 
 		Resolver resolver = this.resolver(callChain.getExpressionLanguage());
-
-		result.setCallResults(
-				callChain.getCalls().values().stream().sorted(Comparator.comparing(Call::getKey, String::compareTo))
+		return CallChainResult.builder()
+				.key(callChain.getKey())
+				.startDate(Instant.now())
+				.callResults(callChain.getCalls()
+						.values()
+						.stream()
+						.sorted(Comparator.comparing(Call::getKey, String::compareTo))
 						.map(call -> this.executeCall(call, callChain, context, resolver))
-						.collect(Collectors.toMap(CallResult::getKey, Function.identity(), (cr1, cr2) -> cr1)));
-		result.setEndDate(new Date());
-		return result;
+						.collect(Collectors.toMap(CallResult::getKey, Function.identity(), (cr1, cr2) -> cr1)))
+				.endDate(Instant.now())
+				.build();
 	}
 
-	protected abstract ClientBinding<?, ?, ?> client();
+	public ExecutionResult execute(ExecutionSchedule schedule) {
 
-	public abstract ExecutionResult execute(ExecutionSchedule schedule);
+		return ExecutionResult.builder()
+				.startDate(Instant.now())
+				.id(schedule.getId())
+				.assertionsRun(this.runAssertions)
+				.metricsCollected(this.collectMetrics)
+				.environment(schedule.getEnvironment())
+				.datasets(schedule.getDatasets())
+				.vars(schedule.getVars())
+				.callChainResults(schedule.getCallChains()
+						.stream()
+						.map(cc -> this.executeCallChain(cc, schedule.getContext()))
+						.collect(Collectors.toMap(CallChainResult::getKey, Function.identity())))
+				.endDate(Instant.now())
+				.build();
+	}
 }

@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-package com.eussence.mosquito.core.internal.data;
+package com.eussence.mosquito.core.internal.execution.data;
 
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
