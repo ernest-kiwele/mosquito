@@ -16,6 +16,8 @@
 	<properties>
 		<module.name>${project.groupId}.mosquito.client.cli</module.name>
 		<mosquito.main.class>com.eussence.mosquito.client.cli.MosquitoCli</mosquito.main.class>
+		
+		<jline.version>3.17.1</jline.version>
 	</properties>
 
 	<dependencies>
@@ -37,7 +39,7 @@
 		<dependency>
 			<groupId>org.jline</groupId>
 			<artifactId>jline</artifactId>
-			<version>3.7.1</version>
+			<version>${jline.version}</version>
 		</dependency>
 		
 		<!-- okhttp -->

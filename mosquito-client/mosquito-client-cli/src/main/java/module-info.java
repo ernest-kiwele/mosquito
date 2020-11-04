@@ -24,7 +24,7 @@ module com.eussence.mosquito.client.cli {
 	requires com.eussence.mosquito.core;
 	requires com.eussence.mosquito.api;
 
-	requires jline;
+	requires transitive org.jline;
 	requires org.apache.commons.io;
 	requires org.apache.commons.lang3;
 	requires org.codehaus.groovy;
