@@ -27,6 +27,7 @@ public class StandardHttpDriverFactory implements HttpDriverFactory {
 
 	public static final String PROVIDER_NAME = "com.eussence";
 	public static final String STANDARD_DRIVER_ID = "com.eussence.std";
+	public static final String OKHTTP_DRIVER_ID = "com.eussence.okhttp";
 
 	@Override
 	public String getProvider() {

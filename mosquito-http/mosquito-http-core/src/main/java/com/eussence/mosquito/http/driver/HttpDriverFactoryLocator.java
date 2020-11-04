@@ -91,4 +91,13 @@ public class HttpDriverFactoryLocator {
 				.filter(s -> name.equalsIgnoreCase(s.getName()))
 				.findAny();
 	}
+
+	public Optional<HttpDriverFactory> findById(String id) {
+		Objects.requireNonNull(id, "Name is null");
+
+		return this.listServices()
+				.stream()
+				.filter(s -> id.equalsIgnoreCase(s.getId()))
+				.findAny();
+	}
 }

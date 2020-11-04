@@ -45,9 +45,11 @@ import com.eussence.mosquito.api.exception.MosquitoException;
 import com.eussence.mosquito.api.http.Response;
 import com.eussence.mosquito.api.utils.JsonMapper;
 import com.eussence.mosquito.command.internal.GroovyResolver;
+import com.eussence.mosquito.command.internal.MosquitoScriptContext;
 import com.eussence.mosquito.command.wrapper.Ether;
 import com.eussence.mosquito.command.wrapper.ResponseWrapper;
 import com.eussence.mosquito.core.api.Mosquito;
+import com.eussence.mosquito.core.api.SchedulingConfig;
 import com.eussence.mosquito.http.api.HttpDriverFactory;
 import com.eussence.mosquito.http.driver.HttpDriverFactoryLocator;
 
@@ -78,7 +80,12 @@ public class MosquitoCli {
 	private Terminal terminal;
 	private LineReader lineReader;
 
+	private SchedulingConfig scheduleConfig = SchedulingConfig.builder()
+			.build();
+
 	private MosquitoCli() {
+		MosquitoScriptContext.setScheduler(req -> this.mosquito.getScheduler()
+				.submit(req, scheduleConfig));
 	}
 
 	public static MosquitoCli getInstance() {

@@ -26,6 +26,7 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.core.MediaType;
@@ -45,7 +46,6 @@ import com.eussence.mosquito.api.http.Request;
 import com.eussence.mosquito.api.http.Response;
 import com.eussence.mosquito.api.qa.Assertion;
 import com.eussence.mosquito.api.utils.Templates;
-import com.eussence.mosquito.http.driver.HttpDriverFactoryLocator;
 import com.eussence.mosquito.reports.template.BasicReportTemplate;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -62,12 +62,15 @@ import groovy.lang.Script;
 public class MosquitoScriptContext extends Script {
 
 	private static final ObjectMapper objectMapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
-//	private static ClientBinding<?, ?, ?> client = DefaultClient.builder()
-//			.build();
+	private static Function<Request, Response> httpScheduler;
 
 	@Override
 	public Object run() {
 		return "Ran!";
+	}
+
+	public static void setScheduler(Function<Request, Response> sched) {
+		httpScheduler = sched;
 	}
 
 	protected String echo(Object v) {
@@ -100,9 +103,8 @@ public class MosquitoScriptContext extends Script {
 
 	protected Response http(Request input) {
 
-		var resp = HttpDriverFactoryLocator.getInstance()
-				.getSelectedDriver()
-				.http(input);
+		var resp = httpScheduler.apply(input);
+
 		resp.setRequest(input);
 
 		return resp;

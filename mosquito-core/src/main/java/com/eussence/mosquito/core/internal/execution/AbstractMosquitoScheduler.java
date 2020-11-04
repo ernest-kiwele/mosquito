@@ -58,13 +58,13 @@ public abstract class AbstractMosquitoScheduler implements MosquitoScheduler {
 
 	protected HttpDriver getDriver(String id) {
 		return this.drivers.computeIfAbsent(id, n -> HttpDriverFactoryLocator.getInstance()
-				.findByName(n)
+				.findById(n)
 				.orElseThrow(MosquitoException.supplier("No driver found by name '" + n + "'"))
 				.getDriver());
 	}
 
 	protected String getDriverOrDefault(String n) {
-		return StringUtils.firstNonBlank(n, StandardHttpDriverFactory.STANDARD_DRIVER_ID);
+		return StringUtils.firstNonBlank(n, StandardHttpDriverFactory.OKHTTP_DRIVER_ID);
 	}
 
 	@Override

@@ -36,6 +36,7 @@ import com.eussence.mosquito.command.internal.GroovyResolver;
 import com.eussence.mosquito.command.wrapper.Ether;
 import com.eussence.mosquito.core.api.data.CacheProxy;
 import com.eussence.mosquito.core.api.data.ContextInterface;
+import com.eussence.mosquito.core.internal.execution.StandaloneScheduler;
 import com.eussence.mosquito.core.internal.execution.data.ClusteredCacheProxy;
 import com.eussence.mosquito.core.internal.execution.data.ConfigManager;
 import com.eussence.mosquito.core.internal.execution.data.LocalCacheProxy;
@@ -101,6 +102,7 @@ public class Mosquito {
 			this.initDistributed();
 		} else {
 			this.initStandalone();
+			this.scheduler = StandaloneScheduler.getInstance();
 		}
 
 		return this;
