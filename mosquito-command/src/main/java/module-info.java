@@ -21,7 +21,7 @@ module com.eussence.mosquito.command {
 	exports com.eussence.mosquito.command.internal;
 	exports com.eussence.mosquito.command.api;
 
-	requires com.eussence.mosquito.api;
+	requires transitive com.eussence.mosquito.api;
 	requires com.eussence.mosquito.http;
 	requires com.eussence.mosquito.reports;
 	requires com.fasterxml.jackson.core;

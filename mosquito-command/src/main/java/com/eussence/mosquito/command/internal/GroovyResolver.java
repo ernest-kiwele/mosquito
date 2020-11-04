@@ -65,11 +65,12 @@ public class GroovyResolver implements Resolver {
 
 		try {
 			MapObject context = outerContext;
-			// context.putAll(outerContext);
+
 			context.add("env", environment.getVars())
 					.add("data", datasets)
 					.add("vars", vars)
 					.add("chains", callChains);
+
 			// overwriting...
 			context.putAll(vars);
 			context.putAll(datasets);
@@ -147,16 +148,5 @@ public class GroovyResolver implements Resolver {
 	private void setOnContext(MapObject map) {
 		map.put("__context", map);
 		map.put("resolver", this);
-	}
-
-	public static void main(String[] args) {
-
-		String expression = "getProperty('sample.name') == 'ben' ||  getProperty('sample.name') == 'mark' || getProperty('sample.name') == 'trae'";
-
-		Binding binding = new Binding();
-		binding.setVariable("sample.name", "bens");
-		GroovyShell shell = new GroovyShell(binding);
-		Object result = shell.evaluate(expression);
-		System.out.println(result);
 	}
 }

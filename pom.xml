@@ -22,11 +22,10 @@
 	<properties>
 		<jackson.version>2.11.3</jackson.version>
 		<commons.lang.version>3.11</commons.lang.version>
-		<vert.x.version>3.9.3</vert.x.version>
-		<groovy.version>3.0.5</groovy.version>
-		<slf4j.version>1.7.30</slf4j.version>
+		<vert.x.version>3.9.4</vert.x.version>
+		<groovy.version>3.0.6</groovy.version>
 
-		<lombok.version>1.18.10</lombok.version>
+		<lombok.version>1.18.16</lombok.version>
 
 		<junit.jupiter.version>5.7.0</junit.jupiter.version>
 		<junit.platform.version>1.7.0</junit.platform.version>
@@ -87,13 +86,6 @@
 			<groupId>io.vertx</groupId>
 			<artifactId>vertx-web</artifactId>
 			<version>${vert.x.version}</version>
-		</dependency>
-
-		<!-- Logging -->
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-log4j12</artifactId>
-			<version>${slf4j.version}</version>
 		</dependency>
 
 		<!-- Lombok -->

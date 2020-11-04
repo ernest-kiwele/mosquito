@@ -99,6 +99,7 @@ public class MosquitoScriptContext extends Script {
 	}
 
 	protected Response http(Request input) {
+
 		var resp = HttpDriverFactoryLocator.getInstance()
 				.getSelectedDriver()
 				.http(input);
