@@ -33,7 +33,7 @@ import lombok.NoArgsConstructor;
  * 
  * @author Ernest Kiwele
  */
-@Builder
+@Builder(toBuilder = true)
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -61,7 +61,7 @@ public class CallChainResult implements Result {
 
 	@Override
 	public Map<String, Result> getChildResults() {
-		return this.callResults == null ? new HashMap<>() : Collections.unmodifiableMap(this.callResults);
+		return this.callResults == null ? Map.of() : Collections.unmodifiableMap(this.callResults);
 	}
 
 	@Override
