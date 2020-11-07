@@ -18,11 +18,12 @@ import com.eussence.mosquito.api.CallChain
 import com.eussence.mosquito.api.MapObject
 import com.eussence.mosquito.api.data.Dataset
 import com.eussence.mosquito.api.data.Environment
-import com.eussence.mosquito.api.data.Vars
 import com.eussence.mosquito.api.http.Request
 import com.eussence.mosquito.api.http.Response
 import com.eussence.mosquito.http.api.DefaultClient
 import com.fasterxml.jackson.annotation.JsonIgnore
+
+import groovy.transform.CompileStatic
 
 /**
  * The ether is the execution context from which all commands are evaluated. It
@@ -30,6 +31,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore
  * 
  * @author Ernest Kiwele
  */
+@CompileStatic
 public class Ether {
 
 	private static final long serialVersionUID = -7825203213429363914L
@@ -78,10 +80,6 @@ public class Ether {
 	}
 
 	public MapObject putAllFields() {
-		if(allMapped) {
-			return this
-		}
-
 		return MapObject.instance().add("callChains", callChains)
 				.add("environments", environments)
 				.add("dataSets", dataSets)
@@ -149,7 +147,7 @@ public class Ether {
 	 * Set the value of dataSets
 	 * @param dataSets the dataSets to set
 	 */
-	public void setDataSets(Map<String, Object> dataSets) {
+	public void setDataSets(Map<String, Dataset> dataSets) {
 		this.dataSets = dataSets
 	}
 
@@ -157,7 +155,7 @@ public class Ether {
 	 * Get the value of vars
 	 * @return the vars
 	 */
-	public Map<String, Vars> getVars() {
+	public Map<String, Object> getVars() {
 		return vars
 	}
 

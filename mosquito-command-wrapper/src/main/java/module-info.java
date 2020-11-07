@@ -13,13 +13,15 @@
  */
 
 /**
- * @author ernest
- *
+ * Light command interface wrapper for classes that are exposed for
+ * user-friendly interaction.
+ * 
+ * @author Ernest Kiwele
  */
 module com.eussence.mosquito.command.wrapper {
 	exports com.eussence.mosquito.command.wrapper;
 
-	requires com.eussence.mosquito.http;
+	requires transitive com.eussence.mosquito.http;
 	requires org.codehaus.groovy;
 
 	requires static lombok;
