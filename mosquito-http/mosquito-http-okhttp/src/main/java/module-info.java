@@ -29,6 +29,8 @@ module com.eussence.mosquito.http.okhttp {
 	requires org.apache.commons.lang3;
 	requires static lombok;
 
+	requires org.apache.commons.io;
+
 	provides com.eussence.mosquito.http.api.HttpDriverFactory
 			with com.eussence.mosquito.http.okhttp.OkHttpDriverFactory;
 }

@@ -15,21 +15,29 @@
 
 package com.eussence.mosquito.http.okhttp;
 
+import java.io.File;
+import java.io.InputStream;
 import java.util.Base64;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import com.eussence.mosquito.api.AuthType;
+import com.eussence.mosquito.api.exception.CheckedRunnable;
 import com.eussence.mosquito.api.exception.MosquitoException;
 import com.eussence.mosquito.api.http.AuthData;
 import com.eussence.mosquito.api.http.Body;
+import com.eussence.mosquito.api.http.BodyPart;
 import com.eussence.mosquito.api.http.HttpMethod;
 import com.eussence.mosquito.api.http.Request;
 
+import okhttp3.Headers;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 import okhttp3.Response;
@@ -173,7 +181,31 @@ public class ClientManager {
 	}
 
 	private RequestBody createRequestBody(Body body) {
-		if (body.isString()) {
+		if (body.isMultipart()) {
+			MultipartBody.Builder requestBody = new MultipartBody.Builder().setType(MultipartBody.FORM);
+			for (BodyPart part : body.getParts()) {
+				if (null != part.getEntity()) {
+					if (part.getEntity() instanceof InputStream) {
+						byte[] content = new byte[(int) part.getSize()];
+						CheckedRunnable.wrap(() -> IOUtils.readFully((InputStream) part.getEntity(), content));
+						requestBody.addPart(Headers.of(part.getHeaders()), RequestBody.create(content));
+					} else if (part.getEntity() instanceof byte[]) {
+						requestBody.addPart(Headers.of(part.getHeaders()),
+								RequestBody.create((byte[]) part.getEntity()));
+					} else if (part.getEntity() instanceof String) {
+						requestBody.addPart(Headers.of(part.getHeaders()),
+								RequestBody.create((String) part.getEntity(), MediaType.get(part.getMediaType())));
+					} else if (part.isFromFile() && StringUtils.isNotBlank(part.getLoadedFromFile())) {
+						requestBody.addPart(Headers.of(part.getHeaders()), RequestBody
+								.create(new File(part.getLoadedFromFile()), MediaType.get(part.getMediaType())));
+					} else {
+						throw new MosquitoException(
+								"Unable to resolve the entity from part's data: " + part.getEntity());
+					}
+				}
+			}
+			return requestBody.build();
+		} else if (body.isString()) {
 			return RequestBody.create(body.string(), okhttp3.MediaType.parse(body.getMediaType()));
 		} else {
 			return RequestBody.create(body.bytes(), okhttp3.MediaType.parse(body.getMediaType()));
