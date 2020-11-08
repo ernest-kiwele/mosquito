@@ -28,7 +28,6 @@ import com.eussence.mosquito.api.command.CommandLanguage;
 import com.eussence.mosquito.api.command.Resolver;
 import com.eussence.mosquito.api.data.Dataset;
 import com.eussence.mosquito.api.data.Environment;
-import com.eussence.mosquito.api.data.Vars;
 import com.eussence.mosquito.api.exception.MosquitoException;
 
 import groovy.lang.Binding;
@@ -60,8 +59,8 @@ public class GroovyResolver implements Resolver {
 	}
 
 	@Override
-	public Object eval(String template, Environment environment, Map<String, Dataset> datasets, Map<String, Vars> vars,
-			Map<String, CallChain> callChains, MapObject outerContext) {
+	public Object eval(String template, Environment environment, Map<String, Dataset> datasets,
+			Map<String, Object> vars, Map<String, CallChain> callChains, MapObject outerContext) {
 
 		try {
 			MapObject context = outerContext;

@@ -188,9 +188,17 @@ public class VertxHttpBridge {
 			String charSet = extractCharSet(contentTypeHeader);
 
 			if (isTextContentType(response.getHeader("Content-Type"))) {
-				builder.body(new Body(body.getString(0, body.length()), mediaType, charSet));
+				builder.body(Body.builder()
+						.entity(body.getString(0, body.length()))
+						.mediaType(mediaType)
+						.charSet(charSet)
+						.build());
 			} else {
-				builder.body(new Body(body.getBytes(), mediaType, charSet));
+				builder.body(Body.builder()
+						.entity(body.getBytes())
+						.mediaType(mediaType)
+						.charSet(charSet)
+						.build());
 			}
 
 			future.complete(builder.build());

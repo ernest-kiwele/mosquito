@@ -18,6 +18,7 @@ package com.eussence.mosquito.command.wrapper
 import com.eussence.mosquito.api.AuthType
 import com.eussence.mosquito.api.http.AuthData
 import com.eussence.mosquito.api.http.Body
+import com.eussence.mosquito.api.http.BodyPart
 import com.eussence.mosquito.api.http.HttpMethod
 import com.eussence.mosquito.api.http.Request
 import com.eussence.mosquito.api.http.RequestTemplate
@@ -105,7 +106,16 @@ class RequestWrapper {
 
 	void entity(Object e) {
 		Body b = this.request.body ?: Body.builder().build()
+		this.request.body = b
+
 		b.entity = e
+	}
+
+	void part(String file) {
+		Body b = this.request.body ?: Body.builder().build()
+		this.request.body = b
+		b.part(BodyPart.fromFile(file))
+		b.multipart = true
 	}
 
 	Object payload() {
