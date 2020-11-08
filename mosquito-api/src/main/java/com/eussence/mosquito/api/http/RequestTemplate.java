@@ -15,7 +15,9 @@
 
 package com.eussence.mosquito.api.http;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
@@ -73,6 +75,9 @@ public class RequestTemplate {
 	@Builder.Default
 	private Map<String, String> postResponseVariables = new HashMap<>();
 
+	private boolean multipart;
+	private List<String> partFiles = new ArrayList<>();
+
 	public RequestTemplate headerTemplate(String k, String v) {
 		this.headerTemplates.put(k, v);
 		return this;
@@ -98,10 +103,19 @@ public class RequestTemplate {
 				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
 		requestBuilder.method(method);
 		if (method.isBodied()) {
-			requestBuilder.body(Body.builder()
-					.entity(r.eval(context, this.entityTemplate))
-					.mediaType(this.mediaType)
-					.build());
+			Body.BodyBuilder bodyBuilder = Body.builder()
+					.multipart(this.multipart);
+			if (this.multipart) {
+				if (null != this.partFiles) {
+					bodyBuilder.parts(this.partFiles.stream()
+							.map(BodyPart::fromFile)
+							.collect(Collectors.toList()));
+				}
+			} else {
+				bodyBuilder.entity(r.eval(context, this.entityTemplate))
+						.mediaType(this.mediaType);
+			}
+			requestBuilder.body(bodyBuilder.build());
 		}
 
 		requestBuilder.authType(this.authType);

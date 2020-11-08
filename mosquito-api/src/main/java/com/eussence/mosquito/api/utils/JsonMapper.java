@@ -64,11 +64,19 @@ public class JsonMapper {
 		return CheckedExecutable.wrap(() -> objectMapper.writeValueAsString(o));
 	}
 
+	public static byte[] jsonBytes(Object o) throws MosquitoException {
+		return CheckedExecutable.wrap(() -> objectMapper.writeValueAsBytes(o));
+	}
+
 	public static String jsonPretty(Object o) throws MosquitoException {
 		return CheckedExecutable.wrap(() -> prettyObjectMapper.writeValueAsString(o));
 	}
 
 	public static <T> T fromJson(String s, Class<T> target) throws MosquitoException {
+		return CheckedExecutable.wrap(() -> objectMapper.readValue(s, target));
+	}
+
+	public static <T> T fromJson(byte[] s, Class<T> target) throws MosquitoException {
 		return CheckedExecutable.wrap(() -> objectMapper.readValue(s, target));
 	}
 

@@ -36,4 +36,5 @@ module com.eussence.mosquito.api {
 	requires org.apache.commons.lang3;
 	requires transitive org.codehaus.groovy;
 	requires com.fasterxml.jackson.datatype.jsr310;
+	requires org.apache.tika.core;
 }

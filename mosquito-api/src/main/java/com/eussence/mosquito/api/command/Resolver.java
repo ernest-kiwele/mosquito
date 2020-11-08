@@ -21,7 +21,6 @@ import com.eussence.mosquito.api.CallChain;
 import com.eussence.mosquito.api.MapObject;
 import com.eussence.mosquito.api.data.Dataset;
 import com.eussence.mosquito.api.data.Environment;
-import com.eussence.mosquito.api.data.Vars;
 
 /**
  * A resolver is a language-specific expression evaluator that processes
@@ -39,6 +38,6 @@ public interface Resolver {
 
 	Map<String, Object> exec(MapObject context, String script);
 
-	Object eval(String template, Environment environment, Map<String, Dataset> datasets, Map<String, Vars> vars,
+	Object eval(String template, Environment environment, Map<String, Dataset> datasets, Map<String, Object> vars,
 			Map<String, CallChain> callChains, MapObject outerContext);
 }

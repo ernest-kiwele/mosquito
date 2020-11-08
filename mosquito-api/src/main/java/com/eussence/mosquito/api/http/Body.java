@@ -15,16 +15,18 @@
 
 package com.eussence.mosquito.api.http;
 
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import javax.ws.rs.core.MediaType;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.eussence.mosquito.api.exception.MosquitoException;
+import com.eussence.mosquito.api.utils.JsonMapper;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -50,7 +52,10 @@ public class Body {
 	private String mediaType = MediaType.APPLICATION_JSON;
 	private String charSet;
 
-	private static final ObjectMapper objectMapper = new ObjectMapper();
+	@Builder.Default
+	private boolean multipart = false;
+	@Builder.Default
+	private List<BodyPart> parts = new ArrayList<>();
 
 	public String textEntity() {
 		if (entity instanceof String)
@@ -70,11 +75,7 @@ public class Body {
 			System.out.println("Trying to parse '" + this.mediaType + "' as JSON");
 		}
 
-		try {
-			return objectMapper.readValue(this.bytes(), Object.class);
-		} catch (IOException e) {
-			throw new RuntimeException("Failed to make JSON from entity: " + e.getMessage(), e);
-		}
+		return JsonMapper.fromJson(this.bytes(), Object.class);
 	}
 
 	public byte[] bytes() {
@@ -87,18 +88,14 @@ public class Body {
 				try {
 					return ((String) entity).getBytes(this.charSet);
 				} catch (UnsupportedEncodingException e) {
-					throw new RuntimeException(
+					throw new MosquitoException(
 							"Unable to get bytes from string entity using character set " + this.charSet, e);
 				}
 			} else {
 				return ((String) entity).getBytes();
 			}
 		} else if (MediaType.APPLICATION_JSON.equals(this.mediaType)) {
-			try {
-				return objectMapper.writeValueAsBytes(this.entity);
-			} catch (JsonProcessingException e) {
-				throw new RuntimeException("Could not represent the entity as JSON bytes: " + e.getMessage(), e);
-			}
+			return JsonMapper.jsonBytes(this.entity);
 		}
 
 		throw new IllegalStateException("Failed to convert class " + this.entity.getClass()
@@ -115,21 +112,22 @@ public class Body {
 				try {
 					return new String((byte[]) entity, this.charSet);
 				} catch (UnsupportedEncodingException e) {
-					throw new RuntimeException(
+					throw new MosquitoException(
 							"Unable to get bytes from string entity using character set " + this.charSet, e);
 				}
 			} else {
 				return new String((byte[]) entity);
 			}
 		} else if (MediaType.APPLICATION_JSON.equals(this.mediaType)) {
-			try {
-				return objectMapper.writeValueAsString(this.entity);
-			} catch (JsonProcessingException e) {
-				throw new RuntimeException("Could not represent the entity as JSON: " + e.getMessage(), e);
-			}
+			return JsonMapper.json(this.entity);
 		}
 
 		throw new IllegalStateException("Failed to convert class " + this.entity.getClass()
 				.getName() + " to String");
+	}
+
+	public Body part(BodyPart part) {
+		this.parts.add(Objects.requireNonNull(part));
+		return this;
 	}
 }
