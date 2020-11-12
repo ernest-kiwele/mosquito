@@ -152,7 +152,7 @@ public class MosquitoScriptContext extends Script {
 	}
 
 	protected Environment env(String key, String name, boolean production, Map<String, Object> vars) {
-		return this.env(key, name, production, vars);
+		return this.environment(key, name, production, vars);
 	}
 
 	protected Environment environment(String key, Map<String, Object> vars) {

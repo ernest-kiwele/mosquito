@@ -28,11 +28,13 @@ import org.jline.reader.Completer;
 import org.jline.reader.EndOfFileException;
 import org.jline.reader.History;
 import org.jline.reader.LineReader;
+import org.jline.reader.LineReader.Option;
 import org.jline.reader.LineReaderBuilder;
 import org.jline.reader.MaskingCallback;
 import org.jline.reader.Parser;
 import org.jline.reader.UserInterruptException;
 import org.jline.reader.impl.DefaultParser;
+import org.jline.reader.impl.DefaultParser.Bracket;
 import org.jline.reader.impl.history.DefaultHistory;
 import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
@@ -385,6 +387,11 @@ public class MosquitoCli {
 		Parser parser = null;
 		DefaultParser p = new DefaultParser();
 		p.setEofOnUnclosedQuote(true);
+		p.setEofOnEscapedNewLine(true);
+		p.setQuoteChars(new char[] { '\'', '"' });
+		p.setEscapeChars(new char[] { '\\' });
+		p.setEofOnUnclosedBracket(Bracket.CURLY, Bracket.ROUND, Bracket.SQUARE);
+
 		parser = p;
 		// stuff
 
@@ -402,6 +409,9 @@ public class MosquitoCli {
 				.completer(completer)
 				.parser(parser)
 				.variable(LineReader.HISTORY_FILE, new File(this.getConfigDirectory(), HISTORY_FILE_NAME))
+				.variable(LineReader.SECONDARY_PROMPT_PATTERN, "> ")
+				.variable(LineReader.INDENTATION, 2)
+				.option(Option.INSERT_BRACKET, true)
 				.build();
 
 		this.lineReader = reader;
