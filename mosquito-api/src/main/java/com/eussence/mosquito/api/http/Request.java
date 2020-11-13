@@ -111,6 +111,14 @@ public final class Request {
 		private Body body = Body.builder()
 				.build();
 
+		public RequestBuilder to(String uri) {
+			return this.uri(uri);
+		}
+
+		public RequestBuilder from(String uri) {
+			return this.uri(uri);
+		}
+
 		public RequestBuilder header(String name, String value) {
 			this.headers.put(name, value);
 			return this;
