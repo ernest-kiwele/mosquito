@@ -21,6 +21,8 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
+import javax.ws.rs.core.MediaType;
+
 import org.apache.commons.lang3.StringUtils;
 
 import com.eussence.mosquito.api.AuthType;
@@ -50,15 +52,12 @@ public final class Request {
 	@Builder.Default
 	private HttpMethod method = HttpMethod.GET;
 
-	@Builder.Default
-	private Map<String, String> headers = new HashMap<>();
+	private Map<String, String> headers;
 
 	@Builder.Default
 	private Map<String, String> parameters = new HashMap<>();
 
-	@Builder.Default
-	private Body body = Body.builder()
-			.build();
+	private Body body;
 
 	private AuthType authType;
 
@@ -105,5 +104,73 @@ public final class Request {
 			return;
 
 		this.headers.forEach(headerTaker);
+	}
+
+	public static class RequestBuilder {
+		private Map<String, String> headers = new HashMap<>();
+		private Body body = Body.builder()
+				.build();
+
+		public RequestBuilder header(String name, String value) {
+			this.headers.put(name, value);
+			return this;
+		}
+
+		public RequestBuilder header(Map<String, String> headers) {
+			if (null == headers) {
+				return this;
+			}
+
+			this.headers.putAll(headers);
+			return this;
+		}
+
+		public RequestBuilder entity(Object o) {
+			if (this.body != null) {
+				this.body.setEntity(o);
+			} else {
+				this.body = Body.builder()
+						.entity(o)
+						.build();
+			}
+			return this;
+		}
+
+		public RequestBuilder mediaType(String mt) {
+			if (this.body != null) {
+				this.body.setMediaType(mt);
+			} else {
+				this.body = Body.builder()
+						.mediaType(mt)
+						.build();
+			}
+			return this;
+		}
+
+		public RequestBuilder json(Object o) {
+			if (this.body != null) {
+				this.body.setMediaType(MediaType.APPLICATION_JSON);
+				this.body.setEntity(o);
+			} else {
+				this.body = Body.builder()
+						.mediaType(MediaType.APPLICATION_JSON)
+						.entity(o)
+						.build();
+			}
+			return this;
+		}
+
+		public RequestBuilder json(Map<String, Object> o) {
+			if (this.body != null) {
+				this.body.setMediaType(MediaType.APPLICATION_JSON);
+				this.body.setEntity(o);
+			} else {
+				this.body = Body.builder()
+						.mediaType(MediaType.APPLICATION_JSON)
+						.entity(o)
+						.build();
+			}
+			return this;
+		}
 	}
 }
