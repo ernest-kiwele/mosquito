@@ -51,6 +51,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
+import groovy.lang.Closure;
 import groovy.lang.GString;
 import groovy.lang.MissingPropertyException;
 import groovy.lang.Script;
@@ -108,6 +109,33 @@ public class MosquitoScriptContext extends Script {
 		resp.setRequest(input);
 
 		return resp;
+	}
+
+	private Response requestDelegate(Closure<Object> closure, HttpMethod method) {
+		var builder = Request.builder()
+				.method(method);
+
+		closure.setResolveStrategy(Closure.DELEGATE_FIRST);
+		closure.setDelegate(builder);
+		closure.call();
+
+		return this.http(builder.build());
+	}
+
+	public Response get(Closure<Object> closure) {
+		return this.requestDelegate(closure, HttpMethod.GET);
+	}
+
+	public Response post(Closure<Object> closure) {
+		return this.requestDelegate(closure, HttpMethod.POST);
+	}
+
+	public Response put(Closure<Object> closure) {
+		return this.requestDelegate(closure, HttpMethod.PUT);
+	}
+
+	public Response patch(Closure<Object> closure) {
+		return this.requestDelegate(closure, HttpMethod.PATCH);
 	}
 
 	public Response get(GString uri) {
