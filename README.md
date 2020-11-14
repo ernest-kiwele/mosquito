@@ -13,7 +13,7 @@ This is a simple maven project. The artifact can be run as a `jar` file or it ca
 To package an executable jar, make sure your `JAVA_HOME` variable points to an installation of JDK-11 or newer, then:
 
 ```
-mvn clean package
+$ mvn clean package
 ```
 
 The command-line jar will be created at `mosquito-client/mosquito-client-cli/target/mosquito-client-cli-[VERSION].jar`, and it's a fat jar with all dependencies packaged in the archive.
