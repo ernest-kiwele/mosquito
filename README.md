@@ -40,7 +40,7 @@ $ ./mosquito-cli
 To run the CLI client, call `java` with the cli fat-jar artifact:
 
 ```
-java -jar mosquito-client/mosquito-client-cli/target/mosquito-client-cli-[VERSION].jar
+$ java -jar mosquito-client/mosquito-client-cli/target/mosquito-client-cli-[VERSION].jar
 ```
 
 Where `[VERSION]` is the project version.
@@ -81,7 +81,6 @@ As groovy supports infix syntax, one can achieve the same thing using:
 
 ```
 mosquito:groovy> get 'http://localhost/' headers
-
 ```
 
 ## Elaborate requests
@@ -90,12 +89,13 @@ The user has a lot more control than just calling a get with a URL. The followin
 
 ```
 mosquito:groovy|response> get {
->   from 'https://api.stackexchange.com/2.2/questions'
->   param site:'stackoverflow'
->   param order:'desc'
->   param sort:'votes'
->   param filter:'default'
->   param tagged:'groovy-3.0'}
+   from 'https://api.stackexchange.com/2.2/questions'
+   param site:'stackoverflow'
+   param order:'desc'
+   param sort:'votes'
+   param filter:'default'
+   param tagged:'groovy-3.0'
+}
 ```
 
 The closure (code in `{...}`) passed to get executes a request builder that sets the URI and a few query parameters. The resulting URI is something like:
@@ -108,11 +108,11 @@ In the same way, headers can be specified:
 
 ```
 mosquito:groovy|response> get {
->   from 'https://api.stackexchange.com/2.2/questions'
->   param site:'stackoverflow'
->   header key:'value'
->   header 'Header-Name':'Header-Value'
-> }
+   from 'https://api.stackexchange.com/2.2/questions'
+   param site:'stackoverflow'
+   header key:'value'
+   header 'Header-Name':'Header-Value'
+}
 ```
 
 There are many techniques made available for constructing requests in this way, including changing methods, adding a payload, etc. See the documentation for more.
@@ -121,16 +121,17 @@ There are many techniques made available for constructing requests in this way, 
 
 When a command is made to execute an HTTP request, the console displays the result as a response object to the console in JSON format. At the same time, it switches the `mode` to `response` (shown in the prompt `mosquito:groovy|response`), which simply makes response attributes accessible without need to qualify them. The last response is the one that will be read when getting relative values from response objects.
 
-As an example, the following requests fetches java-tagged StackOverflow questions:
+As an example, the following requests fetches `java-stream`-tagged StackOverflow questions:
 
 ```
 mosquito:groovy|response> get {
->   from 'https://api.stackexchange.com/2.2/questions'
->   param site:'stackoverflow'
->   param order:'desc'
->   param sort:'votes'
->   param filter:'default'
->   param tagged:'java-stream'}
+   from 'https://api.stackexchange.com/2.2/questions'
+   param site:'stackoverflow'
+   param order:'desc'
+   param sort:'votes'
+   param filter:'default'
+   param tagged:'java-stream'
+}
 ```
 
 A large object is printed to the console on completion of the request. That object remains stored in memory as the latest `Response` object. The following commands read values off that response object:
@@ -184,7 +185,7 @@ mosquito:groovy|response> body.entity.items[0]
 }
 ```
 
-`body.entity.items` simply accesses the `items` attribute of the response JSON, which, for the `/questions` request, is a JSON array.
+`body.entity.items` simply accesses the `items` attribute of the response JSON, which, for the `/questions` request, is a JSON array. `Response.body.entity` is the response path that holds the response body.
 
 You can then make use of Groovy's power to read/slice/manipulate response data:
 
