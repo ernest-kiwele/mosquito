@@ -50,6 +50,7 @@ import com.eussence.mosquito.api.utils.JsonMapper;
 import com.eussence.mosquito.command.internal.GroovyResolver;
 import com.eussence.mosquito.command.internal.MosquitoScriptContext;
 import com.eussence.mosquito.command.wrapper.Ether;
+import com.eussence.mosquito.command.wrapper.ProgramExtensionsManager;
 import com.eussence.mosquito.command.wrapper.ResponseWrapper;
 import com.eussence.mosquito.core.api.Mosquito;
 import com.eussence.mosquito.core.api.SchedulingConfig;
@@ -99,7 +100,8 @@ public class MosquitoCli {
 		this.mosquito = Mosquito.instance();
 		this.bootstrap();
 		Request.requestHandler = MosquitoScriptContext::schedule;
-//		this.ether.put("scheduler", LocalExecutionScheduler.instance(new ArrayList<>(),
+		ProgramExtensionsManager.setupDefaults();
+//		this.ether.put("scheduler", LocalExecutionScheduler.instance(new ArrayList<>(), 
 //				f -> GroovyResolver.getInstance(), DefaultClient.builder()::build));
 
 		try {
