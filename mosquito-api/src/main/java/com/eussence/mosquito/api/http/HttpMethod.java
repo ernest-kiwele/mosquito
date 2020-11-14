@@ -15,6 +15,11 @@
 
 package com.eussence.mosquito.api.http;
 
+import java.util.Arrays;
+import java.util.Optional;
+
+import org.apache.commons.lang3.StringUtils;
+
 /**
  * A simple list of supported HTTP methods.
  * 
@@ -48,5 +53,11 @@ public enum HttpMethod {
 
 	public boolean isBodied() {
 		return bodied;
+	}
+
+	public static Optional<HttpMethod> of(String s) {
+		return Arrays.stream(values())
+				.filter(v -> StringUtils.equalsAnyIgnoreCase(v.name(), StringUtils.trim(s)))
+				.findAny();
 	}
 }
