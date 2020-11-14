@@ -57,6 +57,8 @@ import groovy.lang.MissingPropertyException;
 import groovy.lang.Script;
 
 /**
+ * Base class for Groovy (and perhaps other) scripts interpreted by mosquito-cli
+ * or other interfaces.
  * 
  * @author Ernest Kiwele
  */
