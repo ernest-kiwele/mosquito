@@ -103,7 +103,10 @@ public class MosquitoScriptContext extends Script {
 	}
 
 	protected Response http(Request input) {
+		return schedule(input);
+	}
 
+	public static Response schedule(Request input) {
 		var resp = httpScheduler.apply(input);
 
 		resp.setRequest(input);
@@ -140,6 +143,58 @@ public class MosquitoScriptContext extends Script {
 
 	public Response get(GString uri) {
 		return this.get(uri.toString());
+	}
+
+	public Request createpost(Closure<Request.RequestBuilder> closure) {
+		return this.create(HttpMethod.POST, closure);
+	}
+
+	public Request createget(Closure<Request.RequestBuilder> closure) {
+		return this.create(HttpMethod.GET, closure);
+	}
+
+	public Request createput(Closure<Request.RequestBuilder> closure) {
+		return this.create(HttpMethod.PUT, closure);
+	}
+
+	public Request createpatch(Closure<Request.RequestBuilder> closure) {
+		return this.create(HttpMethod.PATCH, closure);
+	}
+
+	public Request createdelete(Closure<Request.RequestBuilder> closure) {
+		return this.create(HttpMethod.PATCH, closure);
+	}
+
+	public Request createhead(Closure<Request.RequestBuilder> closure) {
+		return this.create(HttpMethod.HEAD, closure);
+	}
+
+	public Request createoptions(Closure<Request.RequestBuilder> closure) {
+		return this.create(HttpMethod.OPTIONS, closure);
+	}
+
+	public Request createconnect(Closure<Request.RequestBuilder> closure) {
+		return this.create(HttpMethod.CONNECT, closure);
+	}
+
+	public Request createtrace(Closure<Request.RequestBuilder> closure) {
+		return this.create(HttpMethod.TRACE, closure);
+	}
+
+	public Request create(String method, Closure<Request.RequestBuilder> closure) {
+		return this.create(HttpMethod.of(method)
+				.orElse(HttpMethod.GET), closure);
+	}
+
+	public Request create(HttpMethod method, Closure<Request.RequestBuilder> closure) {
+		var builder = Request.builder()
+				.method(method);
+
+		closure.setResolveStrategy(Closure.DELEGATE_FIRST);
+		closure.setDelegate(builder);
+		closure.call();
+
+		return builder.build();
 	}
 
 	public Response get(String uri) {

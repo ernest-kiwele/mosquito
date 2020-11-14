@@ -19,6 +19,7 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.core.MediaType;
@@ -28,6 +29,7 @@ import org.apache.commons.lang3.StringUtils;
 import com.eussence.mosquito.api.AuthType;
 import com.eussence.mosquito.api.exception.CheckedExecutable;
 
+import groovy.lang.Closure;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -46,6 +48,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public final class Request {
+
+	public static Function<Request, Response> requestHandler;
 
 	private String uri;
 
@@ -104,6 +108,19 @@ public final class Request {
 			return;
 
 		this.headers.forEach(headerTaker);
+	}
+
+	public Response call() {
+		return requestHandler.apply(this);
+	}
+
+	public Response call(Closure<Object> modifier) {
+		var builder = this.toBuilder();
+		modifier.setDelegate(builder);
+		modifier.setResolveStrategy(Closure.DELEGATE_FIRST);
+		modifier.call();
+
+		return requestHandler.apply(builder.build());
 	}
 
 	public static class RequestBuilder {

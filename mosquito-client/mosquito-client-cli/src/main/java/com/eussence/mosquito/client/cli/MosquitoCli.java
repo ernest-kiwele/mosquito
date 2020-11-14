@@ -44,6 +44,7 @@ import org.jline.utils.InfoCmp.Capability;
 
 import com.eussence.mosquito.api.command.CommandLanguage;
 import com.eussence.mosquito.api.exception.MosquitoException;
+import com.eussence.mosquito.api.http.Request;
 import com.eussence.mosquito.api.http.Response;
 import com.eussence.mosquito.api.utils.JsonMapper;
 import com.eussence.mosquito.command.internal.GroovyResolver;
@@ -97,6 +98,7 @@ public class MosquitoCli {
 	public void startup(boolean cli) {
 		this.mosquito = Mosquito.instance();
 		this.bootstrap();
+		Request.requestHandler = MosquitoScriptContext::schedule;
 //		this.ether.put("scheduler", LocalExecutionScheduler.instance(new ArrayList<>(),
 //				f -> GroovyResolver.getInstance(), DefaultClient.builder()::build));
 
