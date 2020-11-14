@@ -58,8 +58,7 @@ public final class Request {
 
 	private Map<String, String> headers;
 
-	@Builder.Default
-	private Map<String, String> parameters = new HashMap<>();
+	private Map<String, String> parameters;
 
 	private Body body;
 
@@ -125,6 +124,7 @@ public final class Request {
 
 	public static class RequestBuilder {
 		private Map<String, String> headers = new HashMap<>();
+		private Map<String, String> parameters = new HashMap<>();
 		private Body body = Body.builder()
 				.build();
 
@@ -148,6 +148,35 @@ public final class Request {
 
 			this.headers.putAll(headers);
 			return this;
+		}
+
+		public RequestBuilder param(String name, String value) {
+			this.parameters.put(name, value);
+			return this;
+		}
+
+		public RequestBuilder parameter(String name, String value) {
+			return this.param(name, value);
+		}
+
+		public RequestBuilder param(Map<String, String> params) {
+			if (null != params) {
+				this.parameters.putAll(params);
+			}
+
+			return this;
+		}
+
+		public RequestBuilder params(Map<String, String> params) {
+			return this.param(params);
+		}
+
+		public RequestBuilder parameters(Map<String, String> params) {
+			return this.param(params);
+		}
+
+		public RequestBuilder parameter(Map<String, String> params) {
+			return this.param(params);
 		}
 
 		public RequestBuilder entity(Object o) {
