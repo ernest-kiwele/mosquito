@@ -39,6 +39,8 @@ public enum BuiltInCommand {
 			MosquitoCli.instance::modeRequest),
 	MODE_RESPONSE("moderesponse", Set.of("moderesponse", "mode-response", "mode response"),
 			MosquitoCli.instance::modeResponse),
+	MODE_NONE("modenone", Set.of("modenone", "mode-none", "mode none", "no mode", "nomode"),
+			MosquitoCli.instance::modeNone),
 	SEND("send", Set.of("send", "go"), MosquitoCli.instance::send),
 	NEW_REQUEST("new-request", Set.of("new-request", "new request"), MosquitoCli.instance::newRequest);
 

@@ -530,6 +530,10 @@ public class MosquitoCli {
 		this.setContext("response");
 	}
 
+	void modeNone(String line, Terminal terminal, Ether ether) {
+		this.setContext(null);
+	}
+
 	void newRequest(String line, Terminal terminal, Ether ether) {
 		String[] parts = line.trim()
 				.split(" +");
@@ -543,7 +547,7 @@ public class MosquitoCli {
 	}
 
 	void send(String command, Terminal terminal, Ether ether) {
-		if (!this.ether.getContextType()
+		if (this.ether.getContextType() == null || !this.ether.getContextType()
 				.equals("request")) {
 			terminal.writer()
 					.println("|>> That can only be done in 'request' mode");
