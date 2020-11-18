@@ -24,6 +24,8 @@ import com.eussence.mosquito.api.http.Request
 import com.eussence.mosquito.api.http.RequestTemplate
 import com.fasterxml.jackson.annotation.JsonValue
 
+import groovy.transform.CompileStatic
+
 /**
  * A request factory is a client-focused version of a request builder, 
  * which exposes easy to use methods for constructing requests through user 
@@ -31,6 +33,7 @@ import com.fasterxml.jackson.annotation.JsonValue
  * 
  * @author Ernest Kiwele
  */
+@CompileStatic
 class RequestWrapper {
 
 	@JsonValue
@@ -48,7 +51,7 @@ class RequestWrapper {
 	}
 
 	RequestWrapper headers(Map<String, String> values) {
-		request.headers = request.headers + values ?: [:]
+		request.headers = request.headers + values ?: new LinkedHashMap<String, String>()
 		this
 	}
 
@@ -128,11 +131,11 @@ class RequestWrapper {
 
 	void basicAuth(String user, String password) {
 		this.request.authType = AuthType.BASIC_AUTH
-		this.request.authData = AuthData.builder().username(user).headerName("Authorization").credentials(Base64.getEncoder().encodeToString("$user:$password".toString().bytes).toCharArray())
+		this.request.authData = AuthData.builder().username(user).headerName("Authorization").credentials(Base64.getEncoder().encodeToString("$user:$password".toString().bytes).toCharArray()).build()
 	}
 
 	void bearer(String token) {
 		this.request.authType = AuthType.BEARER_TOKEN
-		this.request.authData = AuthData.builder().headerName("Authorization").credentials(token.toCharArray())
+		this.request.authData = AuthData.builder().headerName("Authorization").credentials(token.toCharArray()).build()
 	}
 }

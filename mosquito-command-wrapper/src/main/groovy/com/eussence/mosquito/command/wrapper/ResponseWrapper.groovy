@@ -17,11 +17,14 @@ package com.eussence.mosquito.command.wrapper
 
 import com.eussence.mosquito.api.http.Response
 
+import groovy.transform.CompileStatic
+
 /**
  * A command-friendly wrapper for responses.
  * 
  * @author Ernest Kiwele
  */
+@CompileStatic
 class ResponseWrapper {
 
 	@Delegate

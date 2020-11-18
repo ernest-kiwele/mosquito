@@ -16,8 +16,8 @@
 	<properties>
 		<module.name>${project.groupId}.mosquito.client.cli</module.name>
 		<mosquito.main.class>com.eussence.mosquito.client.cli.MosquitoCli</mosquito.main.class>
-		
 		<jline.version>3.17.1</jline.version>
+		<graalvm.version>20.2.0</graalvm.version>
 	</properties>
 
 	<dependencies>
@@ -41,7 +41,7 @@
 			<artifactId>jline</artifactId>
 			<version>${jline.version}</version>
 		</dependency>
-		
+
 		<!-- okhttp -->
 		<dependency>
 			<groupId>${project.groupId}</groupId>
@@ -53,45 +53,18 @@
 			<artifactId>mosquito-http-okhttp</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+
+		<!-- GraalVM -->
+		<dependency>
+			<groupId>org.graalvm.sdk</groupId>
+			<artifactId>graal-sdk</artifactId>
+			<version>${graalvm.version}</version>
+			<scope>provided</scope>
+		</dependency>
 	</dependencies>
 
 	<build>
 		<plugins>
-<!-- 			<plugin> -->
-<!-- 				<groupId>org.apache.maven.plugins</groupId> -->
-<!-- 				<artifactId>maven-dependency-plugin</artifactId> -->
-<!-- 				<version>3.1.2</version> -->
-<!-- 				<executions> -->
-<!-- 					<execution> -->
-<!-- 						<phase>package</phase> -->
-<!-- 						<goals> -->
-<!-- 							<goal>copy-dependencies</goal> -->
-<!-- 						</goals> -->
-<!-- 						<configuration> -->
-<!-- 							<outputDirectory>${project.build.directory}/lib</outputDirectory> -->
-<!-- 						</configuration> -->
-<!-- 					</execution> -->
-<!-- 				</executions> -->
-<!-- 			</plugin> -->
-<!-- 			<plugin> -->
-<!-- 				<groupId>org.apache.maven.plugins</groupId> -->
-<!-- 				<artifactId>maven-jar-plugin</artifactId> -->
-<!-- 				<version>3.2.0</version> -->
-<!-- 				<configuration> -->
-<!-- 					<archive> -->
-<!-- 						<manifest> -->
-<!-- 							<mainClass>${mosquito.main.class}</mainClass> -->
-<!-- 							<addClasspath>false</addClasspath> -->
-<!-- 							<classpathPrefix>lib/</classpathPrefix> -->
-<!-- 						</manifest> -->
-
-<!-- 						<manifestEntries> -->
-<!-- 							<Module-Path>lib/*.jar</Module-Path> -->
-<!-- 						</manifestEntries> -->
-<!-- 					</archive> -->
-<!-- 				</configuration> -->
-<!-- 			</plugin> -->
-
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-shade-plugin</artifactId>
@@ -131,31 +104,39 @@
 					</execution>
 				</executions>
 			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>exec-maven-plugin</artifactId>
-				<version>1.4.0</version>
-				<configuration>
-					<mainClass>${mosquito.main.class}</mainClass>
-				</configuration>
-			</plugin>
-			<plugin>
-				<artifactId>maven-jlink-plugin</artifactId>
-				<version>3.0.0-alpha-1</version>
-				<extensions>true</extensions>
-				<configuration>
-					<!-- configuration elements goes here -->
-				</configuration>
-				<dependencies>
-					<dependency>
-						<groupId>org.ow2.asm</groupId>
-						<artifactId>asm</artifactId>
-						<version>9.0</version>
-					</dependency>
-				</dependencies>
-			</plugin>
 		</plugins>
 	</build>
+
+	<profiles>
+		<profile>
+			<id>native-image</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.graalvm.nativeimage</groupId>
+						<artifactId>native-image-maven-plugin</artifactId>
+						<version>${graalvm.version}</version>
+						<executions>
+							<execution>
+								<goals>
+									<goal>native-image</goal>
+								</goals>
+								<phase>package</phase>
+							</execution>
+						</executions>
+						<configuration>
+							<skip>false</skip>
+							<imageName>mosquito-cli</imageName>
+							<mainClass>${mosquito.main.class}</mainClass>
+							<buildArgs>
+								--no-fallback --initialize-at-run-time=io.netty --verbose --report-unsupported-elements-at-runtime --allow-incomplete-classpath
+							</buildArgs>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 
 	<pluginRepositories>
 		<pluginRepository>

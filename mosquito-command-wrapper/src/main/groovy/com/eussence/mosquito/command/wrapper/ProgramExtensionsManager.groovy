@@ -2,11 +2,14 @@ package com.eussence.mosquito.command.wrapper
 
 import java.util.Map.Entry
 
+import groovy.transform.CompileStatic
+
 /**
  * An entry point for triggering extensions added to standard classes.
  * 
  * @author Ernest Kiwele
  */
+@CompileStatic
 class ProgramExtensionsManager {
 
 	static void setupDefaults() {

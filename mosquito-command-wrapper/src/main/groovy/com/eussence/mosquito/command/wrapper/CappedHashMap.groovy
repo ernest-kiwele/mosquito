@@ -15,10 +15,13 @@
 
 package com.eussence.mosquito.command.wrapper
 
+import groovy.transform.CompileStatic
+
 /**
  * A linked hash map with a size cap. Credit for idea: SO, https://stackoverflow.com/a/5601377/5761558
  * @author Ernest Kiwele
  */
+@CompileStatic
 class CappedHashMap<T> extends LinkedHashMap<String, T>{
 
 	int sizeCap = 10
