@@ -16,9 +16,14 @@
 package com.eussence.mosquito.command.wrapper;
 
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
+
+import com.eussence.mosquito.api.http.Request;
+import com.eussence.mosquito.api.http.Response;
+import com.eussence.mosquito.api.utils.JsonMapper;
 
 /**
  * Mixins for map classes.
@@ -31,5 +36,10 @@ public class MapExtensions {
 				.stream()
 				.filter(e -> keys.contains(e.getKey()))
 				.collect(Collectors.toMap(Entry::getKey, Entry::getValue));
+	}
+
+	public static Response call(LinkedHashMap<String, Object> map) {
+		return JsonMapper.fromJson(JsonMapper.json(map), Request.class)
+				.call();
 	}
 }
