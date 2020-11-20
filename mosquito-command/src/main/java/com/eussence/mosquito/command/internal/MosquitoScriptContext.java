@@ -43,6 +43,7 @@ import com.eussence.mosquito.api.execution.ExecutionSchedule;
 import com.eussence.mosquito.api.http.Body;
 import com.eussence.mosquito.api.http.HttpMethod;
 import com.eussence.mosquito.api.http.Request;
+import com.eussence.mosquito.api.http.RequestTemplate;
 import com.eussence.mosquito.api.http.Response;
 import com.eussence.mosquito.api.qa.Assertion;
 import com.eussence.mosquito.api.utils.Templates;
@@ -248,6 +249,16 @@ public class MosquitoScriptContext extends Script {
 		return environment(key, vars);
 	}
 
+	protected RequestTemplate template(Closure<Object> filler) {
+		var builder = RequestTemplate.builder();
+
+		filler.setDelegate(builder);
+		filler.setResolveStrategy(Closure.DELEGATE_FIRST);
+		filler.call();
+
+		return builder.build();
+	}
+
 	protected Map<String, Object> systemVars() {
 		return System.getenv()
 				.entrySet()
@@ -268,7 +279,6 @@ public class MosquitoScriptContext extends Script {
 	}
 
 	public Object propertyMissing(String name) {
-		System.out.print("Property missing >> " + name);
 		throw new MissingPropertyException("I don't know of anything called '" + name + "'");
 	}
 
