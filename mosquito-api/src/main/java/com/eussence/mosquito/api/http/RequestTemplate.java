@@ -19,11 +19,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.function.Function;
-import java.util.stream.Collectors;
+import java.util.function.Supplier;
 
-import org.apache.commons.lang3.StringUtils;
+import javax.ws.rs.core.MediaType;
 
 import com.eussence.mosquito.api.AuthType;
 import com.eussence.mosquito.api.MapObject;
@@ -56,11 +55,9 @@ public class RequestTemplate {
 
 	private String uriTemplate;
 
-	@Builder.Default
-	private Map<String, String> headerTemplates = new HashMap<>();
+	private Map<String, String> headerTemplates;
 
-	@Builder.Default
-	private Map<String, String> parameterTemplates = new HashMap<>();
+	private Map<String, String> parameterTemplates;
 
 	private HttpMethod method;
 	private String entityTemplate;
@@ -88,46 +85,175 @@ public class RequestTemplate {
 		return this;
 	}
 
-	public Request toRequest(Function<CommandLanguage, Resolver> resolverFactory, MapObject context) {
-		Resolver r = Objects.requireNonNull(resolverFactory.apply(this.lang),
-				"Resolver factory returned null for language: " + this.lang);
-		var requestBuilder = Request.builder();
-		requestBuilder.uri((String) r.eval(context, this.uriTemplate));
-		requestBuilder.headers(this.headerTemplates.entrySet()
-				.stream()
-				.map(e -> Map.entry(e.getKey(), (String) r.eval(context, e.getValue())))
-				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
-		requestBuilder.parameters(this.parameterTemplates.entrySet()
-				.stream()
-				.map(e -> Map.entry(e.getKey(), (String) r.eval(context, e.getValue())))
-				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
-		requestBuilder.method(method);
-		if (method.isBodied()) {
-			Body.BodyBuilder bodyBuilder = Body.builder()
-					.multipart(this.multipart);
-			if (this.multipart) {
-				if (null != this.partFiles) {
-					bodyBuilder.parts(this.partFiles.stream()
-							.map(BodyPart::fromFile)
-							.collect(Collectors.toList()));
-				}
-			} else {
-				bodyBuilder.entity(r.eval(context, this.entityTemplate))
-						.mediaType(this.mediaType);
+	public Request toRequest(Function<CommandLanguage, Resolver> resolverFactory, Supplier<MapObject> contextSupplier) {
+		return RequestTemplateMapper.instance()
+				.toRequest(this, resolverFactory, contextSupplier);
+	}
+
+	public Request toRequest() {
+		return RequestTemplateMapper.instance()
+				.toRequest(this);
+	}
+
+	public Response call() {
+		return this.toRequest()
+				.call();
+	}
+
+	public static class RequestTemplateBuilder {
+
+		private Map<String, String> headerTemplates = new HashMap<>();
+		private Map<String, String> parameterTemplates = new HashMap<>();
+		private Body body = Body.builder()
+				.build();
+
+		public RequestTemplateBuilder uri(String uri) {
+			return this.uriTemplate(uri);
+		}
+
+		public RequestTemplateBuilder to(String uri) {
+			return this.uriTemplate(uri);
+		}
+
+		public RequestTemplateBuilder from(String uri) {
+			return this.uriTemplate(uri);
+		}
+
+		public RequestTemplateBuilder header(String name, String value) {
+			this.headerTemplates.put(name, value);
+			return this;
+		}
+
+		public RequestTemplateBuilder header(Map<String, String> headers) {
+			if (null == headers) {
+				return this;
 			}
-			requestBuilder.body(bodyBuilder.build());
+
+			this.headerTemplates.putAll(headers);
+			return this;
 		}
 
-		requestBuilder.authType(this.authType);
-		if (StringUtils.isNotBlank(this.authCredentialsTemplate)) {
-			requestBuilder.authData(AuthData.builder()
-					.credentials(((String) r.eval(context, this.authCredentialsTemplate)).toCharArray())
-					.headerName(this.authHeaderName)
-					.build());
+		public RequestTemplateBuilder param(String name, String value) {
+			this.parameterTemplates.put(name, value);
+			return this;
 		}
 
-		requestBuilder.dataSet(this.dataSet);
+		public RequestTemplateBuilder parameter(String name, String value) {
+			return this.param(name, value);
+		}
 
-		return requestBuilder.build();
+		public RequestTemplateBuilder param(Map<String, String> params) {
+			if (null != params) {
+				this.parameterTemplates.putAll(params);
+			}
+
+			return this;
+		}
+
+		public RequestTemplateBuilder params(Map<String, String> params) {
+			return this.param(params);
+		}
+
+		public RequestTemplateBuilder parameters(Map<String, String> params) {
+			return this.param(params);
+		}
+
+		public RequestTemplateBuilder parameter(Map<String, String> params) {
+			return this.param(params);
+		}
+
+		public RequestTemplateBuilder entity(Object o) {
+			if (this.body != null) {
+				this.body.setEntity(o);
+			} else {
+				this.body = Body.builder()
+						.entity(o)
+						.build();
+			}
+			return this;
+		}
+
+		public RequestTemplateBuilder mediaType(String mt) {
+			if (this.body != null) {
+				this.body.setMediaType(mt);
+			} else {
+				this.body = Body.builder()
+						.mediaType(mt)
+						.build();
+			}
+			return this;
+		}
+
+		public RequestTemplateBuilder json(Object o) {
+			if (this.body != null) {
+				this.body.setMediaType(MediaType.APPLICATION_JSON);
+				this.body.setEntity(o);
+			} else {
+				this.body = Body.builder()
+						.mediaType(MediaType.APPLICATION_JSON)
+						.entity(o)
+						.build();
+			}
+			return this;
+		}
+
+		public RequestTemplateBuilder json(Map<String, Object> o) {
+			if (this.body != null) {
+				this.body.setMediaType(MediaType.APPLICATION_JSON);
+				this.body.setEntity(o);
+			} else {
+				this.body = Body.builder()
+						.mediaType(MediaType.APPLICATION_JSON)
+						.entity(o)
+						.build();
+			}
+			return this;
+		}
+
+		public RequestTemplateBuilder get() {
+			return this.method(HttpMethod.GET);
+		}
+
+		public RequestTemplateBuilder post() {
+			return this.method(HttpMethod.POST);
+		}
+
+		public RequestTemplateBuilder put() {
+			return this.method(HttpMethod.PUT);
+		}
+
+		public RequestTemplateBuilder delete() {
+			return this.method(HttpMethod.DELETE);
+		}
+
+		public RequestTemplateBuilder patch() {
+			return this.method(HttpMethod.PATCH);
+		}
+
+		public RequestTemplateBuilder head() {
+			return this.method(HttpMethod.HEAD);
+		}
+
+		public RequestTemplateBuilder options() {
+			return this.method(HttpMethod.OPTIONS);
+		}
+
+		public RequestTemplateBuilder trace() {
+			return this.method(HttpMethod.TRACE);
+		}
+
+		public RequestTemplateBuilder connect() {
+			return this.method(HttpMethod.CONNECT);
+		}
+
+		public RequestTemplateBuilder method(String m) {
+			return this.method(HttpMethod.of(m)
+					.orElse(HttpMethod.GET));
+		}
+
+		public RequestTemplateBuilder method(HttpMethod m) {
+			this.method = m;
+			return this;
+		}
 	}
 }

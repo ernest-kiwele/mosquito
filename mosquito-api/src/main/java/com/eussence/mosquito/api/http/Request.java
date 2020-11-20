@@ -53,8 +53,7 @@ public final class Request {
 
 	private String uri;
 
-	@Builder.Default
-	private HttpMethod method = HttpMethod.GET;
+	private HttpMethod method;
 
 	private Map<String, String> headers;
 
@@ -125,6 +124,8 @@ public final class Request {
 	public static class RequestBuilder {
 		private Map<String, String> headers = new HashMap<>();
 		private Map<String, String> parameters = new HashMap<>();
+		private HttpMethod method = HttpMethod.GET;
+
 		private Body body = Body.builder()
 				.build();
 
@@ -224,6 +225,52 @@ public final class Request {
 						.entity(o)
 						.build();
 			}
+			return this;
+		}
+
+		public RequestBuilder get() {
+			return this.method(HttpMethod.GET);
+		}
+
+		public RequestBuilder post() {
+			return this.method(HttpMethod.POST);
+		}
+
+		public RequestBuilder put() {
+			return this.method(HttpMethod.PUT);
+		}
+
+		public RequestBuilder delete() {
+			return this.method(HttpMethod.DELETE);
+		}
+
+		public RequestBuilder patch() {
+			return this.method(HttpMethod.PATCH);
+		}
+
+		public RequestBuilder head() {
+			return this.method(HttpMethod.HEAD);
+		}
+
+		public RequestBuilder options() {
+			return this.method(HttpMethod.OPTIONS);
+		}
+
+		public RequestBuilder trace() {
+			return this.method(HttpMethod.TRACE);
+		}
+
+		public RequestBuilder connect() {
+			return this.method(HttpMethod.CONNECT);
+		}
+
+		public RequestBuilder method(String m) {
+			return this.method(HttpMethod.of(m)
+					.orElse(HttpMethod.GET));
+		}
+
+		public RequestBuilder method(HttpMethod m) {
+			this.method = m;
 			return this;
 		}
 	}
