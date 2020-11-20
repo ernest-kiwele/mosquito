@@ -45,6 +45,7 @@ import org.jline.utils.InfoCmp.Capability;
 import com.eussence.mosquito.api.command.CommandLanguage;
 import com.eussence.mosquito.api.exception.MosquitoException;
 import com.eussence.mosquito.api.http.Request;
+import com.eussence.mosquito.api.http.RequestTemplateMapper;
 import com.eussence.mosquito.api.http.Response;
 import com.eussence.mosquito.api.utils.JsonMapper;
 import com.eussence.mosquito.command.internal.GroovyResolver;
@@ -53,6 +54,7 @@ import com.eussence.mosquito.command.wrapper.Ether;
 import com.eussence.mosquito.command.wrapper.ProgramExtensionsManager;
 import com.eussence.mosquito.command.wrapper.ResponseWrapper;
 import com.eussence.mosquito.core.api.Mosquito;
+import com.eussence.mosquito.core.api.MosquitoScheduler;
 import com.eussence.mosquito.core.api.SchedulingConfig;
 import com.eussence.mosquito.http.api.HttpDriverFactory;
 import com.eussence.mosquito.http.driver.HttpDriverFactoryLocator;
@@ -101,6 +103,8 @@ public class MosquitoCli {
 		this.bootstrap();
 		Request.requestHandler = MosquitoScriptContext::schedule;
 		ProgramExtensionsManager.setupDefaults();
+		RequestTemplateMapper.instance()
+				.setup(MosquitoScheduler.defaultResolverFactory(), this.ether::putAllFields);
 //		this.ether.put("scheduler", LocalExecutionScheduler.instance(new ArrayList<>(), 
 //				f -> GroovyResolver.getInstance(), DefaultClient.builder()::build));
 

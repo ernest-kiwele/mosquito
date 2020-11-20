@@ -17,12 +17,16 @@ package com.eussence.mosquito.core.api;
 
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 
 import com.eussence.mosquito.api.CallChain;
+import com.eussence.mosquito.api.command.CommandLanguage;
+import com.eussence.mosquito.api.command.Resolver;
 import com.eussence.mosquito.api.execution.ExecutionResult;
 import com.eussence.mosquito.api.http.Request;
 import com.eussence.mosquito.api.http.RequestTemplate;
 import com.eussence.mosquito.api.http.Response;
+import com.eussence.mosquito.command.internal.GroovyResolver;
 import com.eussence.mosquito.command.wrapper.Ether;
 
 /**
@@ -46,4 +50,8 @@ public interface MosquitoScheduler {
 
 	CompletableFuture<ExecutionResult> submitAsync(CallChain callChain, Ether contextEther,
 			SchedulingConfig scheduleConfig);
+
+	static Function<CommandLanguage, Resolver> defaultResolverFactory() {
+		return lang -> lang == CommandLanguage.GROOVY ? GroovyResolver.getInstance() : null;
+	}
 }

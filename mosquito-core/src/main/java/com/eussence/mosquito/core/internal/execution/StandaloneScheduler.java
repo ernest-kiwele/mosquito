@@ -113,7 +113,7 @@ public class StandaloneScheduler extends AbstractMosquitoScheduler {
 	@Override
 	protected List<Request> resolveRequestTemplate(RequestTemplate template, Ether contextEther) {
 
-		Request request = template.toRequest(resolverFactory, contextEther.putAllFields());
+		Request request = template.toRequest(resolverFactory, contextEther::putAllFields);
 
 		if (StringUtils.isNotBlank(template.getDataSet())) {
 			return this.getDataSet(contextEther.getDataSets()

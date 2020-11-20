@@ -79,7 +79,7 @@ public class StandaloneSchedule {
 	protected Request getRequestForCall(Call call, CommandLanguage lang, MapObject context) {
 
 		return call.getRequestTemplate()
-				.toRequest(resolverFactory, context);
+				.toRequest(resolverFactory, () -> context);
 	}
 
 	protected AssertionResult runAssertion(Call call, Assertion assertion, Request request, Response response,
