@@ -26,6 +26,7 @@ import org.apache.commons.lang3.StringUtils;
 import com.eussence.mosquito.api.MapObject;
 import com.eussence.mosquito.api.command.CommandLanguage;
 import com.eussence.mosquito.api.command.Resolver;
+import com.eussence.mosquito.api.utils.Templates;
 
 /**
  * A singleton for mapping request templates to requests, holding
@@ -62,7 +63,8 @@ public class RequestTemplateMapper {
 		Resolver r = Objects.requireNonNull(resolverFactory.apply(template.getLang()),
 				"Resolver factory returned null for language: " + template.getLang());
 		var requestBuilder = Request.builder();
-		requestBuilder.uri((String) r.eval(contextSupplier.get(), template.getUriTemplate()));
+		requestBuilder.uri(Templates
+				.castString(r.eval(contextSupplier.get(), Templates.multilineQuote(template.getUriTemplate()))));
 		requestBuilder.headers(template.getHeaderTemplates()
 				.entrySet()
 				.stream()

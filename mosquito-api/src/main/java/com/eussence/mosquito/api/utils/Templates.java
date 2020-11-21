@@ -38,4 +38,16 @@ public class Templates {
 	public static <T> T safeConvert(Object source, Class<T> target) {
 		return objectMapper.convertValue(source, target);
 	}
+
+	public static String singleQuote(String s) {
+		return s == null ? null : "'" + s + "'";
+	}
+
+	public static String multilineQuote(String s) {
+		return s == null ? null : "\"\"\"" + s + "\"\"\"";
+	}
+
+	public static String castString(Object o) {
+		return null == o ? null : (o instanceof String ? (String) o : o.toString());
+	}
 }
