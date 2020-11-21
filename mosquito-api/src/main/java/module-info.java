@@ -17,7 +17,7 @@
  * 
  * @author Ernest Kiwele
  */
-module com.eussence.mosquito.api {
+open module com.eussence.mosquito.api {
 	exports com.eussence.mosquito.api.data;
 	exports com.eussence.mosquito.api.utils;
 	exports com.eussence.mosquito.api.http;

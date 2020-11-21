@@ -15,61 +15,19 @@
 
 package com.eussence.mosquito.api.execution;
 
-import java.util.Date;
+import java.time.Instant;
+
+import groovy.transform.builder.Builder;
+import lombok.Data;
 
 /**
  * 
  * @author Ernest Kiwele
  */
+@Builder
+@Data
 public class ExecutionEvent {
 
 	private String type;
-	private Date eventDate = new Date();
-
-	public static ExecutionEvent newInstance(String type) {
-		ExecutionEvent e = new ExecutionEvent();
-
-		e.type = type;
-		e.eventDate = new Date();
-
-		return e;
-	}
-
-	/**
-	 * Get the value of type
-	 * 
-	 * @return the type
-	 */
-	public String getType() {
-		return type;
-	}
-
-	/**
-	 * Set the value of type
-	 * 
-	 * @param type
-	 *            the type to set
-	 */
-	public void setType(String type) {
-		this.type = type;
-	}
-
-	/**
-	 * Get the value of eventDate
-	 * 
-	 * @return the eventDate
-	 */
-	public Date getEventDate() {
-		return eventDate;
-	}
-
-	/**
-	 * Set the value of eventDate
-	 * 
-	 * @param eventDate
-	 *            the eventDate to set
-	 */
-	public void setEventDate(Date eventDate) {
-		this.eventDate = eventDate;
-	}
+	private Instant eventDate = Instant.now();
 }
