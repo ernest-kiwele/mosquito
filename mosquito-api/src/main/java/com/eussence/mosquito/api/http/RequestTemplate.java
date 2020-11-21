@@ -101,7 +101,7 @@ public class RequestTemplate {
 	}
 
 	public static class RequestTemplateBuilder {
-
+		private HttpMethod method = HttpMethod.GET;
 		private Map<String, String> headerTemplates = new HashMap<>();
 		private Map<String, String> parameterTemplates = new HashMap<>();
 		private Body body = Body.builder()

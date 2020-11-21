@@ -80,7 +80,7 @@ public class Ether {
 	}
 
 	public MapObject putAllFields() {
-		return MapObject.instance().add("callChains", callChains)
+		def r = MapObject.instance().add("callChains", callChains)
 				.add("environments", environments)
 				.add("dataSets", dataSets)
 				.add("vars", vars)
@@ -91,6 +91,10 @@ public class Ether {
 				.add("lastRequest", lastRequest)
 				.add("response", response)
 				.add("contextType", contextType)
+
+		r.putAll(environments[_env]?.vars)
+
+		r
 	}
 
 	public void newRequest(String name) {
