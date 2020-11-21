@@ -22,6 +22,7 @@ import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 import com.eussence.mosquito.api.http.Request;
+import com.eussence.mosquito.api.http.RequestTemplate;
 import com.eussence.mosquito.api.http.Response;
 import com.eussence.mosquito.api.utils.JsonMapper;
 
@@ -39,7 +40,12 @@ public class MapExtensions {
 	}
 
 	public static Response call(LinkedHashMap<String, Object> map) {
-		return JsonMapper.fromJson(JsonMapper.json(map), Request.class)
-				.call();
+		if (map.containsKey("lang")) {
+			return JsonMapper.fromJson(JsonMapper.json(map), RequestTemplate.class)
+					.call();
+		} else {
+			return JsonMapper.fromJson(JsonMapper.json(map), Request.class)
+					.call();
+		}
 	}
 }

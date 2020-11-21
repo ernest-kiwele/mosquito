@@ -92,8 +92,6 @@ public class GroovyResolver implements Resolver {
 	public Object eval(MapObject context, String template) {
 
 		try {
-			System.out.println("Evaluating string: " + template + " \nwith context: " + context);
-
 			this.setOnContext(context);
 			GroovyShell groovyShell = new GroovyShell(this.getCompilerConfiguration());
 			Script script = groovyShell.parse(template);
