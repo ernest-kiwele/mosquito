@@ -28,13 +28,13 @@ public class MapObject extends HashMap<String, Object> {
 
 	private static final long serialVersionUID = -5460954841313832525L;
 
-	public MapObject _map(Map<String, Object> m) {
+	public MapObject toMap(Map<String, Object> m) {
 		this.put("_map", m == null ? new HashMap<String, Object>() : m);
 		return this;
 	}
 
-	public MapObject _map() {
-		return this._map(null);
+	public MapObject toMap() {
+		return this.toMap(null);
 	}
 
 	public static MapObject instance() {
@@ -61,9 +61,5 @@ public class MapObject extends HashMap<String, Object> {
 	public MapObject drop(String key) {
 		remove(key);
 		return this;
-	}
-
-	public <T extends Object> T getAs(String key) {
-		return (T) this.get(key);
 	}
 }

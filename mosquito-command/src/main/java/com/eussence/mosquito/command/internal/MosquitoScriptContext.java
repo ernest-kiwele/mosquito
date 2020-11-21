@@ -233,7 +233,7 @@ public class MosquitoScriptContext extends Script {
 				.name(name)
 				.production(production)
 				.vars(MapObject.instance()
-						._map(vars))
+						.toMap(vars))
 				.build();
 	}
 

@@ -24,7 +24,6 @@ import com.eussence.mosquito.api.CallChainResult;
 import com.eussence.mosquito.api.MapObject;
 import com.eussence.mosquito.api.Result;
 import com.eussence.mosquito.api.data.Environment;
-import com.eussence.mosquito.api.data.Vars;
 import com.eussence.mosquito.api.qa.AssertionResult;
 
 import lombok.AllArgsConstructor;
@@ -49,7 +48,7 @@ public class ExecutionResult implements Result {
 
 	private Environment environment;
 	private List<Map<String, Object>> datasets;
-	private Map<String, Vars> vars;
+	private Map<String, Map<String, Object>> vars;
 
 	private Instant startDate;
 	private Instant endDate;

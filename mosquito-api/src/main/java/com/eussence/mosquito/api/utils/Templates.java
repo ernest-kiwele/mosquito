@@ -15,12 +15,6 @@
 
 package com.eussence.mosquito.api.utils;
 
-import com.eussence.mosquito.api.MapObject;
-import com.eussence.mosquito.api.command.Resolver;
-import com.eussence.mosquito.api.data.TemplatedObject;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 /**
  * A processor of template objects.
  * 
@@ -28,15 +22,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class Templates {
 
-	private static final ObjectMapper objectMapper = new ObjectMapper()
-			.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-
-	public static <T extends Object> T getObject(Resolver resolver, MapObject context, TemplatedObject<T> template) {
-		return objectMapper.convertValue(resolver.eval(context, template.getTemplates()), template.getRealType());
+	private Templates() {
 	}
 
 	public static <T> T safeConvert(Object source, Class<T> target) {
-		return objectMapper.convertValue(source, target);
+		return JsonMapper.getObjectMapper()
+				.convertValue(source, target);
 	}
 
 	public static String singleQuote(String s) {
