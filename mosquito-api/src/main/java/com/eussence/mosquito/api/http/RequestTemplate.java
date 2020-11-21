@@ -74,6 +74,8 @@ public class RequestTemplate {
 	private Map<String, String> postResponseVariables = new HashMap<>();
 
 	private boolean multipart;
+
+	@Builder.Default
 	private List<String> partFiles = new ArrayList<>();
 
 	public RequestTemplate headerTemplate(String k, String v) {

@@ -22,7 +22,6 @@ module com.eussence.mosquito.api {
 	exports com.eussence.mosquito.api.utils;
 	exports com.eussence.mosquito.api.http;
 	exports com.eussence.mosquito.api;
-	exports com.eussence.mosquito.api.config;
 	exports com.eussence.mosquito.api.command;
 	exports com.eussence.mosquito.api.execution;
 	exports com.eussence.mosquito.api.qa;

@@ -38,6 +38,9 @@ public class JsonMapper {
 	private static final ObjectMapper objectMapper = new ObjectMapper();
 	private static final ObjectMapper prettyObjectMapper = new ObjectMapper();
 
+	private JsonMapper() {
+	}
+
 	static {
 		SimpleModule module = new SimpleModule();
 		module.addSerializer(new GroovyStringSerializer());
