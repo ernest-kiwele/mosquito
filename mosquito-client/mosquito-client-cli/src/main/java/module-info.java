@@ -29,6 +29,4 @@ module com.eussence.mosquito.client.cli {
 	requires org.apache.commons.lang3;
 	requires org.codehaus.groovy;
 	requires com.eussence.mosquito.http;
-
-	requires com.eussence.mosquito.command.wrapper;
 }

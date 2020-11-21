@@ -19,7 +19,7 @@
  * @author Ernest Kiwele
  */
 module com.eussence.mosquito.command.wrapper {
-	exports com.eussence.mosquito.command.wrapper;
+//	exports com.eussence.mosquito.command.wrapper;
 
 	requires transitive com.eussence.mosquito.http;
 	requires org.codehaus.groovy;

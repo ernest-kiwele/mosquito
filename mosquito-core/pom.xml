@@ -29,11 +29,6 @@
 		</dependency>
 		<dependency>
 			<groupId>com.eussence</groupId>
-			<artifactId>mosquito-command-wrapper</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.eussence</groupId>
 			<artifactId>mosquito-reports</artifactId>
 			<version>${project.version}</version>
 		</dependency>

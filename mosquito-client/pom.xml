@@ -19,13 +19,8 @@
 	<dependencies>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
-			<artifactId>mosquito-command-wrapper</artifactId>
+			<artifactId>mosquito-command</artifactId>
 			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.eussence</groupId>
-			<artifactId>mosquito-command-wrapper</artifactId>
-			<version>1.0-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 </project>

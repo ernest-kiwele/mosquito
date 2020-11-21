@@ -31,4 +31,8 @@ module com.eussence.mosquito.command {
 	requires org.codehaus.groovy;
 	requires vertx.core;
 	requires org.apache.commons.lang3;
+
+	exports com.eussence.mosquito.command.wrapper;
+
+	requires static lombok;
 }

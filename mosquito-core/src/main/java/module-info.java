@@ -30,6 +30,5 @@ module com.eussence.mosquito.core {
 	requires vertx.core;
 
 	requires static lombok;
-	requires transitive com.eussence.mosquito.command.wrapper;
 	requires com.eussence.mosquito.command;
 }

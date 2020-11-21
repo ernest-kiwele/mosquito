@@ -14,7 +14,7 @@
 		<module>mosquito-http</module>
 		<module>mosquito-command</module>
 		<module>mosquito-core</module>
-		<module>mosquito-command-wrapper</module>
+<!-- 		<module>mosquito-command-wrapper</module> -->
 		<module>mosquito-client</module>
 		<module>mosquito-reports</module>
 	</modules>
