@@ -73,7 +73,11 @@ public class RequestTemplateMapper {
 		requestBuilder.parameters(template.getParameterTemplates()
 				.entrySet()
 				.stream()
-				.map(e -> Map.entry(e.getKey(), (String) r.eval(contextSupplier.get(), e.getValue())))
+				.map(e -> Map.entry(e.getKey(),
+						StringUtils.contains(e.getValue(), "$")
+								? Templates.castString(
+										r.eval(contextSupplier.get(), Templates.multilineQuote(e.getValue())))
+								: e.getValue()))
 				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
 		requestBuilder.method(template.getMethod());
 		if (template.getMethod()
