@@ -119,7 +119,9 @@ public class Mosquito {
 	private void initDistributed() {
 		CompletableFuture<Vertx> f = new CompletableFuture<>();
 
-		VertxOptions options = new VertxOptions().setClustered(true);
+		VertxOptions options = new VertxOptions();
+		options.getEventBusOptions()
+				.setClustered(true);
 
 		Vertx.clusteredVertx(options, res -> {
 			if (res.succeeded()) {
