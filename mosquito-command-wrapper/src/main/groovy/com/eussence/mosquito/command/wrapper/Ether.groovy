@@ -61,7 +61,7 @@ public class Ether {
 	private Request lastRequest = null
 	private ResponseWrapper response = null
 
-	private String contextType = 'request'
+	private String contextType
 
 	private boolean allMapped = false
 

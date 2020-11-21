@@ -26,6 +26,8 @@ import com.eussence.mosquito.api.http.RequestTemplate;
 import com.eussence.mosquito.api.http.Response;
 import com.eussence.mosquito.api.utils.JsonMapper;
 
+import groovy.lang.Closure;
+
 /**
  * Mixins for map classes.
  * 
@@ -46,6 +48,16 @@ public class MapExtensions {
 		} else {
 			return JsonMapper.fromJson(JsonMapper.json(map), Request.class)
 					.call();
+		}
+	}
+
+	public static Response call(LinkedHashMap<String, Object> map, Closure<Object> modifier) {
+		if (map.containsKey("lang")) {
+			return JsonMapper.fromJson(JsonMapper.json(map), RequestTemplate.class)
+					.call(modifier);
+		} else {
+			return JsonMapper.fromJson(JsonMapper.json(map), Request.class)
+					.call(modifier);
 		}
 	}
 }
