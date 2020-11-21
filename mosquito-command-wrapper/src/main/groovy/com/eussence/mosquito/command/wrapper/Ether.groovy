@@ -19,6 +19,7 @@ import com.eussence.mosquito.api.MapObject
 import com.eussence.mosquito.api.data.Dataset
 import com.eussence.mosquito.api.data.Environment
 import com.eussence.mosquito.api.http.Request
+import com.eussence.mosquito.api.http.RequestTemplate
 import com.eussence.mosquito.api.http.Response
 import com.eussence.mosquito.http.api.DefaultClient
 import com.fasterxml.jackson.annotation.JsonIgnore
@@ -51,8 +52,10 @@ public class Ether {
 	private DefaultClient client = DefaultClient.builder().build()
 	private String _env = "_dev"
 
+	private Map<String, RequestTemplate> templates = [:]
 	private Map<String, RequestWrapper> requests = CappedHashMap.<RequestWrapper>instance(5)
 	private Map<String, Response> responses = CappedHashMap.<Response>instance(5)
+	private Map<String, Object> desktop = [:]
 
 	private RequestWrapper req = new RequestWrapper()
 	private Request lastRequest = null
@@ -91,6 +94,9 @@ public class Ether {
 				.add("lastRequest", lastRequest)
 				.add("response", response)
 				.add("contextType", contextType)
+				.add("requests", requests)
+				.add("responses", responses)
+				.add('desktop', desktop)
 
 		r.putAll(environments[_env]?.vars)
 
@@ -296,5 +302,13 @@ public class Ether {
 	}
 	public void setContextType(String contextType) {
 		this.contextType = contextType
+	}
+
+	public Map<String, Object> getDesktop() {
+		return desktop
+	}
+
+	public void setDesktop(Map<String, Object> desktop) {
+		this.desktop = desktop
 	}
 }
