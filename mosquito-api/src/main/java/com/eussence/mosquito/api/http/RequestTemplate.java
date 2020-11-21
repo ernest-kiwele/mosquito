@@ -29,6 +29,7 @@ import com.eussence.mosquito.api.MapObject;
 import com.eussence.mosquito.api.command.CommandLanguage;
 import com.eussence.mosquito.api.command.Resolver;
 
+import groovy.lang.Closure;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -41,7 +42,7 @@ import lombok.Setter;
  * 
  * @author Ernest Kiwele
  */
-@Builder
+@Builder(toBuilder = true)
 @Getter
 @Setter
 @AllArgsConstructor
@@ -97,6 +98,18 @@ public class RequestTemplate {
 
 	public Response call() {
 		return this.toRequest()
+				.call();
+	}
+
+	public Response call(Closure<Object> c) {
+
+		var builder = this.toBuilder();
+		c.setDelegate(builder);
+		c.setResolveStrategy(Closure.DELEGATE_FIRST);
+		c.call();
+
+		return builder.build()
+				.toRequest()
 				.call();
 	}
 
