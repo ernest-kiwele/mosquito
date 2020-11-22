@@ -18,6 +18,7 @@ package com.eussence.mosquito.api.http;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -77,7 +78,7 @@ public final class Request {
 
 	public URI uri() {
 		if (StringUtils.isBlank(this.uri)) {
-			return CheckedExecutable.wrap(() -> new URI("http://localhost:80/?" + this.queryString()));
+			return null;
 		}
 
 		return CheckedExecutable.wrap(() -> new URI(this.uri + "?" + this.queryString()));
@@ -95,17 +96,13 @@ public final class Request {
 	}
 
 	public void applyParameters(BiConsumer<String, String> paramTaker) {
-		if (null == this.parameters || this.parameters.isEmpty())
-			return;
-
-		this.parameters.forEach(paramTaker);
+		Optional.ofNullable(this.parameters)
+				.ifPresent(p -> p.forEach(paramTaker));
 	}
 
 	public void applyHeaders(BiConsumer<String, String> headerTaker) {
-		if (null == this.headers || this.headers.isEmpty())
-			return;
-
-		this.headers.forEach(headerTaker);
+		Optional.ofNullable(this.headers)
+				.ifPresent(h -> h.forEach(headerTaker));
 	}
 
 	public Response call() {
