@@ -26,9 +26,6 @@ public class MosquitoException extends RuntimeException {
 
 	private static final long serialVersionUID = -3067231325819536619L;
 
-	public MosquitoException() {
-	}
-
 	public MosquitoException(String e) {
 		super(e);
 	}

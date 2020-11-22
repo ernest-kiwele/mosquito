@@ -18,114 +18,31 @@ package com.eussence.mosquito.api.data;
 import com.eussence.mosquito.api.AuthType;
 import com.eussence.mosquito.api.MapObject;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 /**
  * A dynamically resolvable template of auth data.
  * 
  * @author Ernest Kiwele
  */
+@Builder
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class AuthDataTemplate extends MapObject {
 
 	private static final long serialVersionUID = -8003685348289891361L;
 
+	@Builder.Default
 	private AuthType authType = AuthType.BASIC_AUTH;
 
 	private String usernameTemplate;
 	private String passwordTemplate;
 	private String tokenHeader;
 	private String bearerTokenTemplate;
-
-	/**
-	 * Get the value of authType
-	 * 
-	 * @return the authType
-	 */
-	public AuthType getAuthType() {
-		return authType;
-	}
-
-	/**
-	 * Set the value of authType
-	 * 
-	 * @param authType
-	 *            the authType to set
-	 */
-	public void setAuthType(AuthType authType) {
-		this.authType = authType;
-	}
-
-	/**
-	 * Get the value of usernameTemplate
-	 * 
-	 * @return the usernameTemplate
-	 */
-	public String getUsernameTemplate() {
-		return usernameTemplate;
-	}
-
-	/**
-	 * Set the value of usernameTemplate
-	 * 
-	 * @param usernameTemplate
-	 *            the usernameTemplate to set
-	 */
-	public void setUsernameTemplate(String usernameTemplate) {
-		this.usernameTemplate = usernameTemplate;
-	}
-
-	/**
-	 * Get the value of passwordTemplate
-	 * 
-	 * @return the passwordTemplate
-	 */
-	public String getPasswordTemplate() {
-		return passwordTemplate;
-	}
-
-	/**
-	 * Set the value of passwordTemplate
-	 * 
-	 * @param passwordTemplate
-	 *            the passwordTemplate to set
-	 */
-	public void setPasswordTemplate(String passwordTemplate) {
-		this.passwordTemplate = passwordTemplate;
-	}
-
-	/**
-	 * Get the value of tokenHeader
-	 * 
-	 * @return the tokenHeader
-	 */
-	public String getTokenHeader() {
-		return tokenHeader;
-	}
-
-	/**
-	 * Set the value of tokenHeader
-	 * 
-	 * @param tokenHeader
-	 *            the tokenHeader to set
-	 */
-	public void setTokenHeader(String tokenHeader) {
-		this.tokenHeader = tokenHeader;
-	}
-
-	/**
-	 * Get the value of bearerTokenTemplate
-	 * 
-	 * @return the bearerTokenTemplate
-	 */
-	public String getBearerTokenTemplate() {
-		return bearerTokenTemplate;
-	}
-
-	/**
-	 * Set the value of bearerTokenTemplate
-	 * 
-	 * @param bearerTokenTemplate
-	 *            the bearerTokenTemplate to set
-	 */
-	public void setBearerTokenTemplate(String bearerTokenTemplate) {
-		this.bearerTokenTemplate = bearerTokenTemplate;
-	}
 }

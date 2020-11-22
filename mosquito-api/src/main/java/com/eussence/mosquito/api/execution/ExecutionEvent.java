@@ -27,7 +27,6 @@ import lombok.Data;
 @Builder
 @Data
 public class ExecutionEvent {
-
 	private String type;
 	private Instant eventDate = Instant.now();
 }
