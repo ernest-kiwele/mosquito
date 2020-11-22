@@ -49,7 +49,6 @@ public class HttpCookie {
 	private Map<String, String> attributes = new HashMap<>();
 
 	public static HttpCookie forHeader(String c) {
-
 		String[] parts = c.split(";");
 		String[] nameValuePair = parts[0].split("=");
 
