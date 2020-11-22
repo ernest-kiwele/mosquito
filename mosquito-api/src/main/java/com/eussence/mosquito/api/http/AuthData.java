@@ -15,7 +15,11 @@
 
 package com.eussence.mosquito.api.http;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
  * Authorization data.
@@ -23,46 +27,12 @@ import lombok.Builder;
  * @author Ernest Kiwele
  */
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
 public class AuthData {
-
-	private final String username;
-	private final char[] credentials;
-	private final String headerName;
-
-	public AuthData(String username, char[] password, String headerName) {
-		this.username = username;
-		this.credentials = password;
-		this.headerName = headerName;
-	}
-
-	/**
-	 * Get the value of username
-	 * 
-	 * @return the username
-	 */
-	public String getUsername() {
-		return username;
-	}
-
-	/**
-	 * Get the value of password
-	 * 
-	 * @return the password
-	 */
-	public char[] getPassword() {
-		return credentials;
-	}
-
-	/**
-	 * Get the value of headerName
-	 * 
-	 * @return the headerName
-	 */
-	public String getHeaderName() {
-		return headerName;
-	}
-
-	public char[] getCredentials() {
-		return credentials;
-	}
+	private String username;
+	private char[] credentials;
+	private String headerName;
 }

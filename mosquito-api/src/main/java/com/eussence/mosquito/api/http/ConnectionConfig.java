@@ -15,62 +15,27 @@
 
 package com.eussence.mosquito.api.http;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 /**
  * An object holding all connection-related configuration parameters.
  * 
  * @author Ernest Kiwele
  */
+@Builder
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class ConnectionConfig {
 
 	private boolean validateHostNames;
+	@Builder.Default
 	private long connectionTimeout = 10000L;
 	private long readTimeout;
 	private boolean followRedirects;
-
-	public ConnectionConfig() {
-	}
-
-	public ConnectionConfig(boolean validateHostNames, long connectionTimeout, long readTimeout,
-			boolean followRedirects) {
-		this.validateHostNames = validateHostNames;
-		this.connectionTimeout = connectionTimeout;
-		this.readTimeout = readTimeout;
-		this.followRedirects = followRedirects;
-	}
-
-	/**
-	 * Get the value of validateHostNames
-	 * 
-	 * @return the validateHostNames
-	 */
-	public boolean isValidateHostNames() {
-		return validateHostNames;
-	}
-
-	/**
-	 * Get the value of connectionTimeout
-	 * 
-	 * @return the connectionTimeout
-	 */
-	public long getConnectionTimeout() {
-		return this.connectionTimeout < 1 ? 10000L : this.connectionTimeout;
-	}
-
-	/**
-	 * Get the value of readTimeout
-	 * 
-	 * @return the readTimeout
-	 */
-	public long getReadTimeout() {
-		return readTimeout;
-	}
-
-	/**
-	 * Get the value of followRedirects
-	 * 
-	 * @return the followRedirects
-	 */
-	public boolean isFollowRedirects() {
-		return followRedirects;
-	}
 }

@@ -71,10 +71,6 @@ public class Body {
 	}
 
 	public Object jsonEntity() {
-		if (!MediaType.APPLICATION_JSON.equals(this.mediaType)) {
-			System.out.println("Trying to parse '" + this.mediaType + "' as JSON");
-		}
-
 		return JsonMapper.fromJson(this.bytes(), Object.class);
 	}
 
@@ -98,7 +94,7 @@ public class Body {
 			return JsonMapper.jsonBytes(this.entity);
 		}
 
-		throw new IllegalStateException("Failed to convert class " + this.entity.getClass()
+		throw new MosquitoException("Failed to convert class " + this.entity.getClass()
 				.getName() + " to byte array");
 	}
 
@@ -122,7 +118,7 @@ public class Body {
 			return JsonMapper.json(this.entity);
 		}
 
-		throw new IllegalStateException("Failed to convert class " + this.entity.getClass()
+		throw new MosquitoException("Failed to convert class " + this.entity.getClass()
 				.getName() + " to String");
 	}
 
