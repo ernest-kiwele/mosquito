@@ -196,6 +196,7 @@ public final class Request {
 						.mediaType(mt)
 						.build();
 			}
+
 			return this;
 		}
 
@@ -209,19 +210,7 @@ public final class Request {
 						.entity(o)
 						.build();
 			}
-			return this;
-		}
 
-		public RequestBuilder json(Map<String, Object> o) {
-			if (this.body != null) {
-				this.body.setMediaType(MediaType.APPLICATION_JSON);
-				this.body.setEntity(o);
-			} else {
-				this.body = Body.builder()
-						.mediaType(MediaType.APPLICATION_JSON)
-						.entity(o)
-						.build();
-			}
 			return this;
 		}
 

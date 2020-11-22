@@ -132,5 +132,17 @@ public class RequestTest {
 				.build()
 				.getBody()
 				.getEntity());
+
+		Assertions.assertNotNull(Request.builder()
+				.body(null)
+				.mediaType("b")
+				.build()
+				.getBody());
+
+		Assertions.assertNotNull(Request.builder()
+				.body(null)
+				.entity("b")
+				.build()
+				.getBody());
 	}
 }
