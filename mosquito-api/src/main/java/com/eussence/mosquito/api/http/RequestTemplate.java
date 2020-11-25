@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -119,8 +120,6 @@ public class RequestTemplate {
 		private HttpMethod method = HttpMethod.GET;
 		private Map<String, String> headerTemplates = new HashMap<>();
 		private Map<String, String> parameterTemplates = new HashMap<>();
-		private Body body = Body.builder()
-				.build();
 
 		public RequestTemplateBuilder uri(String uri) {
 			return this.uriTemplate(uri);
@@ -153,15 +152,8 @@ public class RequestTemplate {
 			return this;
 		}
 
-		public RequestTemplateBuilder parameter(String name, String value) {
-			return this.param(name, value);
-		}
-
 		public RequestTemplateBuilder param(Map<String, String> params) {
-			if (null != params) {
-				this.parameterTemplates.putAll(params);
-			}
-
+			this.parameterTemplates.putAll(Objects.requireNonNull(params, "Trying to add null parameter map"));
 			return this;
 		}
 
@@ -169,60 +161,19 @@ public class RequestTemplate {
 			return this.param(params);
 		}
 
-		public RequestTemplateBuilder parameters(Map<String, String> params) {
-			return this.param(params);
-		}
-
-		public RequestTemplateBuilder parameter(Map<String, String> params) {
-			return this.param(params);
-		}
-
-		public RequestTemplateBuilder entity(Object o) {
-			if (this.body != null) {
-				this.body.setEntity(o);
-			} else {
-				this.body = Body.builder()
-						.entity(o)
-						.build();
-			}
+		public RequestTemplateBuilder entity(String template) {
+			this.entityTemplate = template;
 			return this;
 		}
 
 		public RequestTemplateBuilder mediaType(String mt) {
-			if (this.body != null) {
-				this.body.setMediaType(mt);
-			} else {
-				this.body = Body.builder()
-						.mediaType(mt)
-						.build();
-			}
+			this.mediaType = mt;
 			return this;
 		}
 
-		public RequestTemplateBuilder json(Object o) {
-			if (this.body != null) {
-				this.body.setMediaType(MediaType.APPLICATION_JSON);
-				this.body.setEntity(o);
-			} else {
-				this.body = Body.builder()
-						.mediaType(MediaType.APPLICATION_JSON)
-						.entity(o)
-						.build();
-			}
-			return this;
-		}
-
-		public RequestTemplateBuilder json(Map<String, Object> o) {
-			if (this.body != null) {
-				this.body.setMediaType(MediaType.APPLICATION_JSON);
-				this.body.setEntity(o);
-			} else {
-				this.body = Body.builder()
-						.mediaType(MediaType.APPLICATION_JSON)
-						.entity(o)
-						.build();
-			}
-			return this;
+		public RequestTemplateBuilder json(String entityTemplate) {
+			return this.entity(entityTemplate)
+					.mediaType(MediaType.APPLICATION_JSON);
 		}
 
 		public RequestTemplateBuilder get() {
