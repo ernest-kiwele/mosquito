@@ -15,10 +15,47 @@
 
 package com.eussence.mosquito.http.driver;
 
+import java.util.Set;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
+import com.eussence.mosquito.http.api.HttpDriverFactory;
+
 /**
  * 
  * @author Ernest Kiwele
  */
 public class HttpDriverFactoryLocatorTest {
 
+	@Test
+	void testGetAny() {
+		Assertions.assertTrue(HttpDriverFactoryLocator.getInstance()
+				.getAny()
+				.isPresent());
+	}
+
+	@Test
+	void testGetDefault() {
+		Assertions.assertNotNull(HttpDriverFactoryLocator.getInstance()
+				.getSelectedDriver());
+		Assertions.assertNotNull(HttpDriverFactoryLocator.getInstance()
+				.getSelectedFactory());
+	}
+
+	@Test
+	void testListDrivers() {
+		Set<HttpDriverFactory> list = HttpDriverFactoryLocator.getInstance()
+				.listServices();
+		Assertions.assertFalse(list.isEmpty());
+
+		list.forEach(factory -> {
+			Assertions.assertNotNull(HttpDriverFactoryLocator.getInstance()
+					.findById(factory.getId()));
+			Assertions.assertNotNull(HttpDriverFactoryLocator.getInstance()
+					.findByName(factory.getName()));
+			Assertions.assertNotNull(HttpDriverFactoryLocator.getInstance()
+					.findAnyByProvider(factory.getProvider()));
+		});
+	}
 }
