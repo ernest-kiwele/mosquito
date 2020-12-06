@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.util.Base64;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -58,7 +59,7 @@ public class ClientManager {
 	}
 
 	public <T> ResponseHolder<T> http(Request request, Function<ResponseBody, T> bodyExtractor) {
-		switch (request.getMethod()) {
+		switch (Objects.requireNonNull(request.getMethod(), "Request method may not be null")) {
 			case GET:
 			case CONNECT:
 			case DELETE:
@@ -66,7 +67,8 @@ public class ClientManager {
 			case TRACE:
 			case HEAD:
 				return this.bodyLessRequest(this.getClient(request), request.getUri(), request.getHeaders(),
-						request.getParameters(), request.getMethod(), bodyExtractor);
+						request.getParameters(), request.getAuthType(), request.getAuthData(), request.getMethod(),
+						bodyExtractor);
 			case POST:
 			case PUT:
 			case PATCH:
@@ -80,11 +82,6 @@ public class ClientManager {
 	protected OkHttpClient getClient(Request request) {
 		// TODO: Implement client selection based on request connection settings
 		return this.defaultClient;
-	}
-
-	protected <T> ResponseHolder<T> bodyLessRequest(OkHttpClient client, String uri, Map<String, String> headers,
-			Map<String, String> query, HttpMethod method, Function<ResponseBody, T> bodyExtractor) {
-		return this.bodyLessRequest(client, uri, headers, query, null, null, method, bodyExtractor);
 	}
 
 	protected <T> ResponseHolder<T> bodyLessRequest(OkHttpClient client, String uri, Map<String, String> headers,
@@ -115,6 +112,7 @@ public class ClientManager {
 		request = this.setAuthData(request, req.getAuthType(), req.getAuthData());
 
 		req.applyParameters(request::header);
+		req.applyHeaders(request::header);
 
 		try (Response response = client.newCall(request.build())
 				.execute()) {
@@ -192,12 +190,12 @@ public class ClientManager {
 					} else if (part.getEntity() instanceof byte[]) {
 						requestBody.addPart(Headers.of(part.getHeaders()),
 								RequestBody.create((byte[]) part.getEntity()));
-					} else if (part.getEntity() instanceof String) {
-						requestBody.addPart(Headers.of(part.getHeaders()),
-								RequestBody.create((String) part.getEntity(), MediaType.get(part.getMediaType())));
 					} else if (part.isFromFile() && StringUtils.isNotBlank(part.getLoadedFromFile())) {
 						requestBody.addPart(Headers.of(part.getHeaders()), RequestBody
 								.create(new File(part.getLoadedFromFile()), MediaType.get(part.getMediaType())));
+					} else if (part.getEntity() instanceof String) {
+						requestBody.addPart(Headers.of(part.getHeaders()),
+								RequestBody.create((String) part.getEntity(), MediaType.get(part.getMediaType())));
 					} else {
 						throw new MosquitoException(
 								"Unable to resolve the entity from part's data: " + part.getEntity());
