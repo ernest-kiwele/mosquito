@@ -15,23 +15,23 @@
 
 package com.eussence.mosquito.command.wrapper
 
-import groovy.transform.CompileStatic
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Test
 
 /**
- * A linked hash map with a size cap. Credit for idea: SO, https://stackoverflow.com/a/5601377/5761558
+ * 
  * @author Ernest Kiwele
+ *
  */
-@CompileStatic
-class CappedHashMap<T> extends LinkedHashMap<String, T>{
+class CappedHashMapTest {
+	@Test
+	void testCap() {
+		def m = CappedHashMap.instance(5)
+		(1..20).each{
+			println "putting $it"
+			m.put("$it", it)
+		}
 
-	int sizeCap = 10
-
-	static <T> CappedHashMap<T> instance(int size) {
-		new CappedHashMap<>(sizeCap: size)
-	}
-
-	@Override
-	protected boolean removeEldestEntry(java.util.Map.Entry<String, T> eldest) {
-		return this.size() > sizeCap
+		Assertions.assertEquals(5, m.size())
 	}
 }
