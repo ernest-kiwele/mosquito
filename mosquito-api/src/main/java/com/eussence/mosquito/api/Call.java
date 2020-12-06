@@ -60,4 +60,5 @@ public class Call {
 	@Builder.Default
 	private RequestTemplate requestTemplate = RequestTemplate.builder()
 			.build();
+
 }

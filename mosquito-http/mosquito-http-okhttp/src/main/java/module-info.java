@@ -17,7 +17,7 @@
  * 
  * @author Ernest Kiwele
  */
-module com.eussence.mosquito.http.okhttp {
+open module com.eussence.mosquito.http.okhttp {
 	exports com.eussence.mosquito.http.okhttp;
 
 	requires transitive com.eussence.mosquito.api;
