@@ -17,7 +17,7 @@
  * 
  * @author Ernest Kiwele
  */
-module com.eussence.mosquito.command {
+open module com.eussence.mosquito.command {
 	exports com.eussence.mosquito.command.internal;
 
 	requires transitive com.eussence.mosquito.api;
