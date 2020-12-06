@@ -41,9 +41,6 @@ public class ResponseFactory {
 	private static final ResponseFactory instance = new ResponseFactory();
 
 	private ResponseFactory() {
-		if (null != instance) {
-			throw new IllegalStateException("Cannot create multiple instances of ResponseFactory");
-		}
 	}
 
 	public static ResponseFactory instance() {
@@ -97,5 +94,4 @@ public class ResponseFactory {
 				.map(HttpCookie::forHeader)
 				.collect(Collectors.toMap(HttpCookie::getName, Function.identity()));
 	}
-
 }
