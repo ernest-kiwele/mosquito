@@ -17,12 +17,9 @@ package com.eussence.mosquito.command.internal;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.nio.charset.Charset;
-import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
@@ -33,22 +30,20 @@ import javax.ws.rs.core.MediaType;
 
 import org.apache.commons.io.IOUtils;
 
-import com.eussence.mosquito.api.Call;
-import com.eussence.mosquito.api.CallChain;
-import com.eussence.mosquito.api.MapObject;
 import com.eussence.mosquito.api.data.Environment;
+import com.eussence.mosquito.api.exception.CheckedExecutable;
+import com.eussence.mosquito.api.exception.CheckedRunnable;
 import com.eussence.mosquito.api.exception.MosquitoException;
 import com.eussence.mosquito.api.execution.ExecutionResult;
-import com.eussence.mosquito.api.execution.ExecutionSchedule;
 import com.eussence.mosquito.api.http.Body;
 import com.eussence.mosquito.api.http.HttpMethod;
 import com.eussence.mosquito.api.http.Request;
 import com.eussence.mosquito.api.http.RequestTemplate;
 import com.eussence.mosquito.api.http.Response;
 import com.eussence.mosquito.api.qa.Assertion;
+import com.eussence.mosquito.api.utils.JsonMapper;
 import com.eussence.mosquito.api.utils.Templates;
 import com.eussence.mosquito.reports.template.BasicReportTemplate;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
@@ -82,23 +77,11 @@ public class MosquitoScriptContext extends Script {
 	}
 
 	protected String json(Object o) {
-		try {
-			return objectMapper.writeValueAsString(o);
-		} catch (JsonProcessingException e) {
-			throw new MosquitoException("Failed to jsonify: " + e.getMessage());
-		}
+		return JsonMapper.json(o);
 	}
 
 	protected Object fromJson(String o) {
-		try {
-			return objectMapper.readValue(o, Object.class);
-		} catch (Exception e) {
-			throw new MosquitoException("Failed to parse JSON: " + e.getMessage());
-		}
-	}
-
-	protected Call call(Map<String, Object> params) {
-		return Templates.safeConvert(params, Call.class);
+		return JsonMapper.fromJson(o, Object.class);
 	}
 
 	protected Request request(Map<String, Object> params) {
@@ -142,10 +125,6 @@ public class MosquitoScriptContext extends Script {
 
 	public Response patch(Closure<Object> closure) {
 		return this.requestDelegate(closure, HttpMethod.PATCH);
-	}
-
-	public Response get(GString uri) {
-		return this.get(uri.toString());
 	}
 
 	public Request createpost(Closure<Request.RequestBuilder> closure) {
@@ -200,6 +179,10 @@ public class MosquitoScriptContext extends Script {
 		return builder.build();
 	}
 
+	public Response get(GString uri) {
+		return this.get(uri.toString());
+	}
+
 	public Response get(String uri) {
 		return this.http(Request.builder()
 				.uri(uri)
@@ -232,8 +215,7 @@ public class MosquitoScriptContext extends Script {
 				.key(key)
 				.name(name)
 				.production(production)
-				.vars(MapObject.instance()
-						.toMap(vars))
+				.vars(vars)
 				.build();
 	}
 
@@ -292,53 +274,21 @@ public class MosquitoScriptContext extends Script {
 		}
 	}
 
-	protected String dateFormat(Date d) {
-		if (null == d) {
-			return "";
-		}
-
-		return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S").format(d);
-	}
-
 	protected String textFile(String path) {
-		try {
-			return IOUtils.toString(new File(path).toURI(), Charset.defaultCharset());
-		} catch (IOException ioe) {
-			throw new MosquitoException("Could not load file from " + path + ": " + ioe.getMessage(), ioe);
-		}
-	}
-
-	protected Object jsonFile(String path) {
-		return this.fromJson(this.textFile(path));
+		return CheckedExecutable.wrap(() -> IOUtils.toString(new File(path).toURI(), Charset.defaultCharset()));
 	}
 
 	protected Object loadObject(String path, Class<?> cls) {
-		try {
-			return objectMapper.readValue(this.textFile(path), cls);
-		} catch (Exception e) {
-			throw new MosquitoException(e);
-		}
+		return CheckedExecutable.wrap(() -> objectMapper.readValue(this.textFile(path), cls));
 	}
 
 	protected Environment loadEnvironment(String path) {
 		return (Environment) this.loadObject(path, Environment.class);
 	}
 
-	protected CallChain loadChain(String path) {
-		return (CallChain) this.loadObject(path, CallChain.class);
-	}
-
-	protected ExecutionSchedule loadSchedule(String path) {
-		return (ExecutionSchedule) this.loadObject(path, ExecutionSchedule.class);
-	}
-
 	protected void saveJson(Object object, String path) {
-		try {
-			objectMapper.writeValue(new FileOutputStream(path), object);
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw new MosquitoException(e);
-		}
+		CheckedRunnable.wrap(() -> objectMapper.writeValue(new FileOutputStream(path), object))
+				.run();
 	}
 
 	// Date functions

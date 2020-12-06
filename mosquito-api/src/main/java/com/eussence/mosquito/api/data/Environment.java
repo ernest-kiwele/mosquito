@@ -35,7 +35,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-@Builder
+@Builder(toBuilder = true)
 @AllArgsConstructor
 @NoArgsConstructor
 public class Environment {
@@ -56,6 +56,5 @@ public class Environment {
 
 	private String createdBy;
 
-	@Builder.Default
-	private Instant dateCreated = Instant.now();
+	private Instant dateCreated;
 }
