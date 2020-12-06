@@ -16,7 +16,8 @@
 package com.eussence.mosquito.http.okhttp;
 
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import okhttp3.Response;
 
 /**
@@ -24,7 +25,8 @@ import okhttp3.Response;
  * 
  * @author Ernest Kiwele
  */
-@Data
+@Getter
+@Setter
 @Builder
 public class ResponseHolder<T> {
 	private T payload;
