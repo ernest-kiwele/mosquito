@@ -51,7 +51,7 @@ import okhttp3.ResponseBody;
 public class ClientManager {
 
 	private static final ClientManager instance = new ClientManager();
-	private final OkHttpClient defaultClient = new OkHttpClient();
+	private OkHttpClient defaultClient = new OkHttpClient();
 
 	public static ClientManager instance() {
 		return instance;
