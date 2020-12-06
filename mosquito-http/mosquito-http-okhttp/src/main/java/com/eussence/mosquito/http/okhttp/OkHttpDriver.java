@@ -34,6 +34,8 @@ import okhttp3.ResponseBody;
 public class OkHttpDriver implements HttpDriver {
 
 	private static final OkHttpDriver instance = new OkHttpDriver();
+	private ClientManager clientManager = ClientManager.instance();
+	private ResponseFactory responseFactory = ResponseFactory.instance();
 
 	private OkHttpDriver() {
 	}
@@ -45,13 +47,11 @@ public class OkHttpDriver implements HttpDriver {
 	public Response http(Request request) {
 		try {
 			Instant startTime = Instant.now();
-			ResponseHolder<String> response = ClientManager.instance()
-					.http(request, CheckedFunction.wrap(ResponseBody::string));
-			return ResponseFactory.instance()
-					.fromHttpResponse(response, startTime);
+			ResponseHolder<String> response = this.clientManager.http(request,
+					CheckedFunction.wrap(ResponseBody::string));
+			return this.responseFactory.fromHttpResponse(response, startTime);
 		} catch (Exception ex) {
-			return ResponseFactory.instance()
-					.fromException(ex);
+			return this.responseFactory.fromException(ex);
 		}
 	}
 
