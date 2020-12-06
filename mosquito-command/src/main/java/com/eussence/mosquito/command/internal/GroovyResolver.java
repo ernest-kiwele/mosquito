@@ -44,9 +44,6 @@ public class GroovyResolver implements Resolver {
 	private static final GroovyResolver instance = new GroovyResolver();
 
 	private GroovyResolver() {
-		if (null != instance) {
-			throw new IllegalStateException("GroovyResolver cannot be created multiple times");
-		}
 	}
 
 	public static GroovyResolver getInstance() {
@@ -90,7 +87,6 @@ public class GroovyResolver implements Resolver {
 
 	@Override
 	public Object eval(MapObject context, String template) {
-
 		try {
 			this.setOnContext(context);
 			GroovyShell groovyShell = new GroovyShell(this.getCompilerConfiguration());
@@ -101,7 +97,7 @@ public class GroovyResolver implements Resolver {
 
 			return script.run();
 		} catch (CompilationFailedException e) {
-			throw new RuntimeException("Invalid template: " + e.getMessage(), e);
+			throw new MosquitoException("Invalid template: " + e.getMessage(), e);
 		}
 	}
 
@@ -128,7 +124,7 @@ public class GroovyResolver implements Resolver {
 
 			script.run();
 		} catch (CompilationFailedException e) {
-			throw new RuntimeException("Invalid template: " + e.getMessage(), e);
+			throw new MosquitoException("Invalid template: " + e.getMessage(), e);
 		}
 
 		return context;
