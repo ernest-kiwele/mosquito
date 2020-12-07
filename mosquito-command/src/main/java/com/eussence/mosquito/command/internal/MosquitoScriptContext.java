@@ -72,6 +72,10 @@ public class MosquitoScriptContext extends Script {
 		httpScheduler = sched;
 	}
 
+	public static Function<Request, Response> getScheduler() {
+		return httpScheduler;
+	}
+
 	protected String echo(Object v) {
 		return String.valueOf(v);
 	}

@@ -30,7 +30,6 @@ import org.jline.reader.History;
 import org.jline.reader.LineReader;
 import org.jline.reader.LineReader.Option;
 import org.jline.reader.LineReaderBuilder;
-import org.jline.reader.MaskingCallback;
 import org.jline.reader.Parser;
 import org.jline.reader.UserInterruptException;
 import org.jline.reader.impl.DefaultParser;
@@ -80,11 +79,12 @@ public class MosquitoCli {
 	private CommandLanguage lang = CommandLanguage.GROOVY;
 	private String prompt;
 
-	private Throwable lastException;
+	protected Throwable lastException;
 
 	// jline
 	private Terminal terminal;
 	private LineReader lineReader;
+	private boolean exit = false;
 
 	private SchedulingConfig scheduleConfig = SchedulingConfig.builder()
 			.build();
@@ -105,8 +105,6 @@ public class MosquitoCli {
 		ProgramExtensionsManager.setupDefaults();
 		RequestTemplateMapper.instance()
 				.setup(MosquitoScheduler.defaultResolverFactory(), this.ether::putAllFields);
-//		this.ether.put("scheduler", LocalExecutionScheduler.instance(new ArrayList<>(), 
-//				f -> GroovyResolver.getInstance(), DefaultClient.builder()::build));
 
 		try {
 			if (cli)
@@ -196,6 +194,7 @@ public class MosquitoCli {
 	}
 
 	public void quit() {
+		this.exit = true;
 		File etherFile = new File(this.getConfigDirectory(), ETHER_FILE_NAME);
 		System.out.println("Storing session information to '" + etherFile.getAbsolutePath() + "'");
 
@@ -207,24 +206,12 @@ public class MosquitoCli {
 		}
 
 		System.out.println("Goodbye!");
-		System.exit(0);
+
+//		System.exit(0);
 	}
 
 	public String runCommand(String command) {
 		return this.evaluateInput(command);
-	}
-
-	public void runShellCommand(String command) {
-		String[] input = command.split(" +");
-
-		switch (input[0]) {
-			case "$quit": {
-				this.quit();
-			}
-			case "$echo": {
-				System.out.println(String.join(" ", input));
-			}
-		}
 	}
 
 	private void newRequestWrapper(String name) {
@@ -371,24 +358,6 @@ public class MosquitoCli {
 		Completer completer = (reader, line, candidates) -> {
 			if (line.wordIndex() == 0) {
 				candidates.add(new Candidate("println"));
-			} else if (line.words()
-					.get(0)
-					.equals("quit")) {
-				if (line.words()
-						.get(line.wordIndex() - 1)
-						.equals("Option1")) {
-					candidates.add(new Candidate("Param1"));
-					candidates.add(new Candidate("Param2"));
-				} else {
-					if (line.wordIndex() == 1)
-						candidates.add(new Candidate("Option1"));
-					if (!line.words()
-							.contains("Option2"))
-						candidates.add(new Candidate("Option2"));
-					if (!line.words()
-							.contains("Option3"))
-						candidates.add(new Candidate("Option3"));
-				}
 			}
 		};
 
@@ -580,12 +549,11 @@ public class MosquitoCli {
 
 		LineReader reader = this.getLineReader();
 
-		while (2 < 3) { // well, Sonarqube complained about while true, so here we go.
+		while (!this.exit) { // well, Sonarqube complained about while true, so here we go.
 
 			final String line;
 			try {
-				line = StringUtils.trimToEmpty(reader.readLine(this.prompt == null ? this.prompt() : this.prompt, null,
-						(MaskingCallback) null, null));
+				line = StringUtils.trimToEmpty(reader.readLine(this.prompt == null ? this.prompt() : this.prompt));
 			} catch (UserInterruptException e) {
 				// Ignore
 				continue;
