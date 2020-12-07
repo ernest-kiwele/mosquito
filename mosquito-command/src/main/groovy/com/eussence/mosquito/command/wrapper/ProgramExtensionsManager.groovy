@@ -1,7 +1,5 @@
 package com.eussence.mosquito.command.wrapper
 
-import java.util.Map.Entry
-
 import groovy.transform.CompileStatic
 
 /**
@@ -31,9 +29,5 @@ class ProgramExtensionsManager {
 
 	public static void addMixin(Class extendedClass, Class providerClass) {
 		extendedClass.metaClass.mixin(providerClass)
-	}
-
-	public static void addMixins(List<Entry<Class, Class>> pairs) {
-		pairs?.each { addMixin(it.key, it.value) }
 	}
 }
