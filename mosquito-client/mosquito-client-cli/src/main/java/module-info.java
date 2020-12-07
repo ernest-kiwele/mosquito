@@ -17,7 +17,7 @@
  * 
  * @author Ernest Kiwele
  */
-module com.eussence.mosquito.client.cli {
+open module com.eussence.mosquito.client.cli {
 	exports com.eussence.mosquito.client.cli;
 
 	requires com.eussence.mosquito.command;
