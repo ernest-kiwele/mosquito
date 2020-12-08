@@ -4,9 +4,13 @@ An HTTP client wrapper designed for developers, test analysts, and other technic
 
 A Mosquito command line interface is pretty much a code interpreter. The API allows for multiple scripting languages to be used, although currently only Groovy is supported.
 
+# Why Mosquito?
+
+Mosquito is not meant to be a replacement for such great HTTP clients as Postman or curl. It's just designed to be a better fit for developers, offering an interface that allows more than just request/response mechanics. Mosquito is more inspired by HTTPie in its spirit of simplifying things for the developer/user, but it takes things a bit further by providing an environment that not only makes requests, but also supports processing responses programmatically.
+
 # Building
 
-This is a simple maven project. The artifact can be run as a `jar` file or it can be compiled into a native image using GraalVM.
+This is a simple maven project. The artifact is built into a `jar` file. When it's ready for distribution, it will be built into a native image using either jlink or GraalVM; but this is to be sorted out.
 
 ## Maven build
 
@@ -19,6 +23,8 @@ $ mvn clean package
 The command-line jar will be created at `mosquito-client/mosquito-client-cli/target/mosquito-client-cli-[VERSION].jar`, and it's a fat jar with all dependencies packaged in the archive.
 
 ## Creating a native image
+
+*Note that this is currently not fully supported as the resulting image cannot be used without a JDK installation, so it still needs work*
 
 To build a native image that can be run on machines without Java runtimes, one can use GraalVM's native image builder. For that, an installation of GraalVM is needed (with the native image builder installed too).
 
@@ -37,7 +43,7 @@ $ ./mosquito-cli
 
 # Running the command line client
 
-To run the CLI client, call `java` with the cli fat-jar artifact:
+To run the CLI client, call `java` with the cli fat-jar artifact from the project's root directory:
 
 ```
 $ java -jar mosquito-client/mosquito-client-cli/target/mosquito-client-cli-[VERSION].jar
@@ -49,7 +55,7 @@ The native image can simply be executed from the shell.
 
 # Getting started with `mosquito-cli`
 
-When called without arguments, mosquito opens in interactive mode and expects `groovy` commands by default. The interpreter is a full-blown groovy shell that will process any command you give it. So use with care.
+When called without arguments, mosquito opens in interactive mode and expects `groovy` commands by default. The interpreter processes non-native commands as groovy code. So use with care.
 
 The shell exposes some methods that can be called with the infix or postfix syntax to make HTTP calls
 
@@ -214,10 +220,29 @@ All of the above is pure Groovy power, except for Mosquito's extension in `it[['
 This sets good grounds for testing and assertions, which will be documented elsewhere.
 
 
-# Documentation
+# CLI client documentation
 
-The documentation will be indexed [here](docs/index.md)
+## Introduction
 
+The command line client offers an interface for the user to interactively make calls using simple commands based on a DSL that makes it simple to send requests, process responses, store data, etc. This "DSL" is just a collection of methods called directly from the command line.
+
+Beside these methods, the command line interface enables these operations using a simple API with POJOs/POGOs that are created and processed by the user. These include objects such as `Request` and `Response`.
+
+## Using the console
+
+The console is a JLine terminal that would work in most cases as expected:
+
+* It maintains a command history, even across sessions
+* You can use `Ctrl`+`C` to abort a command (and that won't exit the application)
+* You can exit the program with `Ctrl`+`D`
+* You can search the history using `Ctrl`+`R` and navigate options the usual way
+* It understands braces and string quotes, so it can take commands on multiple lines
+
+The following built-in commands are processed specially:
+
+| Command + Synonyms  | Description  |
+| ------------------- | ------------ |
+| Command + Synonyms  | Description  |
 # Status
 
 These are still the days before version 1.0. When the initial feature set is implemented and successfully tested, some distribution packages will be built and made available under releases.
