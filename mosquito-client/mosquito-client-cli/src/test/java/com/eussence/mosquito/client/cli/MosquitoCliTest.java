@@ -67,7 +67,6 @@ public class MosquitoCliTest {
 		CheckedRunnable.wrap(() -> JsonMapper.getObjectMapper()
 				.writeValue(ether, new Ether()))
 				.run();
-
 	}
 
 	@BeforeEach
@@ -80,6 +79,7 @@ public class MosquitoCliTest {
 				.thenReturn(new PrintWriter(output));
 
 		cli.lastException = new MosquitoException("Something wrong");
+		cli.exitOnPromptEnd = false;
 	}
 
 	@Test

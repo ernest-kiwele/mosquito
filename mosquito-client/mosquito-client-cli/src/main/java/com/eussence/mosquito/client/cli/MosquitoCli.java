@@ -85,6 +85,7 @@ public class MosquitoCli {
 	private Terminal terminal;
 	private LineReader lineReader;
 	private boolean exit = false;
+	boolean exitOnPromptEnd = true;
 
 	private SchedulingConfig scheduleConfig = SchedulingConfig.builder()
 			.build();
@@ -126,6 +127,9 @@ public class MosquitoCli {
 		} else {
 			MosquitoCli.instance.startup(true);
 		}
+
+		if (instance.exitOnPromptEnd)
+			System.exit(0);
 	}
 
 	private void runScript(String[] args) {
