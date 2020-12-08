@@ -242,7 +242,19 @@ The following built-in commands are processed specially:
 
 | Command + Synonyms  | Description  |
 | ------------------- | ------------ |
-| Command + Synonyms  | Description  |
+| `quit`, `exit`, `Ctrl`+`D`  | Exit the program gracefully  |
+| `error`  | Shows the message of the last error encountered by Mosquito, any operation  |
+| `trace`  | Shows the stack trace of the last error encountered by Mosquito, any operation  |
+| `cls`, `clear`  | Clears the screen  |
+| `driver`, `driver-info`  | Displays the details of the HTTP client library currently in use  |
+| `drivers`, `list-drivers`  | Displays a list of all discovered HTTP driver libraries available for use  |
+| `setcontext`, `set-context`, `set context`  | Switch command context  |
+| `moderequest`, `mode-request`, `mode request`  | Directly switch command context to `request`  |
+| `moderesponse`, `mode-response`, `mode response`  | Directly switch command context to `response`  |
+| `modenone`, `mode-none`, `mode none`, `no mode`, `nomode`  | Clear selected mode  |
+| `send` | Send current request - only allowed in `request` mode  |
+| `new-request` | Create a new Request object and switch to `request` mode  |
+
 # Status
 
 These are still the days before version 1.0. When the initial feature set is implemented and successfully tested, some distribution packages will be built and made available under releases.
