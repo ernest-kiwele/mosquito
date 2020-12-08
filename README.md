@@ -245,7 +245,7 @@ The following built-in commands are processed specially:
 | `quit`, `exit`, `Ctrl`+`D`  | Exit the program gracefully  |
 | `error`  | Shows the message of the last error encountered by Mosquito, any operation  |
 | `trace`  | Shows the stack trace of the last error encountered by Mosquito, any operation  |
-| `cls`, `clear`  | Clears the screen  |
+| `cls`, `clear`, `Ctrl`+`L`  | Clears the screen  |
 | `driver`, `driver-info`  | Displays the details of the HTTP client library currently in use  |
 | `drivers`, `list-drivers`  | Displays a list of all discovered HTTP driver libraries available for use  |
 | `setcontext`, `set-context`, `set context`  | Switch command context  |
@@ -254,6 +254,43 @@ The following built-in commands are processed specially:
 | `modenone`, `mode-none`, `mode none`, `no mode`, `nomode`  | Clear selected mode  |
 | `send` | Send current request - only allowed in `request` mode  |
 | `new-request` | Create a new Request object and switch to `request` mode  |
+
+The rest of user input is simply code invocations. It's code that allows the user to make HTTP calls and process responses.
+
+First, there's there's the simple command interpreter that can do just about anything, including evaluating expressions:
+
+<img src="docs/files/basic-commands.png" />
+
+Beside these commands, one can also use the Mosquito API which provides a DSL for making HTTP calls, as described in the Getting Started section:
+
+```
+get 'https://api.stackexchange.com/2.2/questions?site=stackoverflow&order=desc&sort=votes&filter=default&tagged=git'
+```
+In the above command, `get` is a call to a `get(String)` method that creates an HTTP `GET` request to the given URL.
+
+Mosquito also gives a global context that hosts various objects, including "environment". These environments can be used to store objects that can be referenced dynamically. The current environment can be referenced using the expression `env`, which is just a field/key in an object within reach in script execution context.
+
+<img src="docs/files/env.png" />
+
+Because one can dynamically access these variables, the preceding command can be shortedned to
+
+```
+get "$so/questions?site=stackoverflow&order=desc&sort=votes&filter=default&tagged=git"
+```
+
+Where `$so` is just a placeholder for the `so` variable available in the environment. **Note** the use of `"` (double quotes) for Groovy String interpolation.
+
+As we'll see later, the above command can be further simplified by storing the entire request along with its parameters in a variable. Mosquito gives a nice API for running commands already stored, with or without on-the-fly alterations.
+
+All methods for making HTTP requests return a `Response` object, which is dumped to the console when the request execution is completed. With or without storing the response object in a variable, one can process it like any other object in a programmatic way:
+
+<img src="docs/files/response-storing.png" />
+
+The above can be achieved also by using a `response` mode and then just reading the `headers` attribute:
+
+<img src="docs/files/mode-response-example.png" />
+
+A "mode" defines a context under which attributes and methods can be accessed relatively. In the above, `headers` is read off the response object (from the last execution). When activated, a "mode" is indicated by text following the language, `groovy` in this case, on the command prompt.
 
 # Status
 
