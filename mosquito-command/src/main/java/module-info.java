@@ -22,7 +22,6 @@ open module com.eussence.mosquito.command {
 
 	requires transitive com.eussence.mosquito.api;
 	requires com.eussence.mosquito.http;
-	requires com.eussence.mosquito.reports;
 	requires com.fasterxml.jackson.core;
 	requires com.fasterxml.jackson.databind;
 	requires java.ws.rs;

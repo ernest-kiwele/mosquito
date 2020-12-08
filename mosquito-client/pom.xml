@@ -13,7 +13,6 @@
 	<description>A common place for standard clients</description>
 	<modules>
 		<module>mosquito-client-cli</module>
-		<module>mosquito-client-web</module>
 	</modules>
 
 	<dependencies>

@@ -33,8 +33,6 @@ import org.apache.commons.io.IOUtils;
 import com.eussence.mosquito.api.data.Environment;
 import com.eussence.mosquito.api.exception.CheckedExecutable;
 import com.eussence.mosquito.api.exception.CheckedRunnable;
-import com.eussence.mosquito.api.exception.MosquitoException;
-import com.eussence.mosquito.api.execution.ExecutionResult;
 import com.eussence.mosquito.api.http.Body;
 import com.eussence.mosquito.api.http.HttpMethod;
 import com.eussence.mosquito.api.http.Request;
@@ -43,7 +41,6 @@ import com.eussence.mosquito.api.http.Response;
 import com.eussence.mosquito.api.qa.Assertion;
 import com.eussence.mosquito.api.utils.JsonMapper;
 import com.eussence.mosquito.api.utils.Templates;
-import com.eussence.mosquito.reports.template.BasicReportTemplate;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
@@ -266,16 +263,6 @@ public class MosquitoScriptContext extends Script {
 
 	public Object propertyMissing(String name) {
 		throw new MissingPropertyException("I don't know of anything called '" + name + "'");
-	}
-
-	protected void report(ExecutionResult result, String htmlPath) {
-		try {
-			IOUtils.write(BasicReportTemplate.getInstance()
-					.getDefaultResultReport(result)
-					.getBytes(), new FileOutputStream(htmlPath));
-		} catch (Exception ex) {
-			throw new MosquitoException("Failed to generate or save report: " + ex.getMessage(), ex);
-		}
 	}
 
 	protected String textFile(String path) {

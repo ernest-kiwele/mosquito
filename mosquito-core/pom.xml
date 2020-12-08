@@ -27,10 +27,5 @@
 			<artifactId>mosquito-command</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>com.eussence</groupId>
-			<artifactId>mosquito-reports</artifactId>
-			<version>${project.version}</version>
-		</dependency>
 	</dependencies>
 </project>
