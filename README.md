@@ -288,7 +288,38 @@ All methods for making HTTP requests return a `Response` object, which is dumped
 
 The above can be achieved also by using a `response` mode and then just reading the `headers` attribute:
 
-<img src="docs/files/mode-response-example.png" />
+```
+mosquito:groovy|response> headers
+```
+```json
+{
+  "date" : [ "Tue, 08 Dec 2020 21:47:38 GMT" ],
+  "server" : [ "Microsoft-IIS/10.0" ],
+  "x-redis-count" : [ "71" ],
+  "x-te-duration-ms" : [ "3" ],
+  "set-cookie" : [ "prov=4ddad2b7-b0eb-4e86-97e0-82db6847263d; expires=Fri, 01 Jan 2055 00:00:00 GMT; domain=.stackexchange.com; path=/; secure; samesite=none; httponly" ],
+  "x-aspnet-duration-ms" : [ "29" ],
+  "x-http-duration-ms" : [ "3" ],
+  "x-sql-duration-ms" : [ "2" ],
+  "x-route-name" : [ "Questions/GetAll" ],
+  "content-type" : [ "application/json; charset=utf-8" ],
+  "x-providence-cookie" : [ "4ddad2b7-b0eb-4e86-97e0-82db6847263d" ],
+  "x-request-guid" : [ "b37fca3d-3932-46a9-ba71-18f3c69d8fa0" ],
+  "cache-control" : [ "private" ],
+  "x-sql-count" : [ "3" ],
+  "x-te-count" : [ "1" ],
+  "x-is-crawler" : [ "1" ],
+  "access-control-allow-methods" : [ "GET, POST" ],
+  "strict-transport-security" : [ "max-age=15552000" ],
+  "x-redis-duration-ms" : [ "10" ],
+  "access-control-allow-origin" : [ "*" ],
+  "access-control-allow-credentials" : [ "false" ],
+  "content-security-policy" : [ "upgrade-insecure-requests; frame-ancestors 'self' https://stackexchange.com" ],
+  "x-content-type-options" : [ "nosniff" ],
+  "x-flags" : [ "AA" ],
+  "x-http-count" : [ "1" ]
+}
+```
 
 A "mode" defines a context under which attributes and methods can be accessed relatively. In the above, `headers` is read off the response object (from the last execution). When activated, a "mode" is indicated by text following the language, `groovy` in this case, on the command prompt.
 
