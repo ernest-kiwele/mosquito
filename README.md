@@ -291,7 +291,7 @@ The above can be achieved also by using a `response` mode and then just reading 
 ```
 mosquito:groovy|response> headers
 ```
-```json
+```javascript
 {
   "date" : [ "Tue, 08 Dec 2020 21:47:38 GMT" ],
   "server" : [ "Microsoft-IIS/10.0" ],
